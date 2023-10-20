@@ -8,17 +8,19 @@
  * gnuplot
 splot "loops_test.gnu" with lines, "loops_test_points.gnu" u 2:3:4 w p  t "points"
 
+ splot "loops_test.gnu" with lines , "loops_every_point-box.gnu" with lines lw 3, "loops_test_points_intr.gnu" t "intersting points", "loops_test_points.gnu" u 2:3:4 w p  t "points"
 
  */
 
 
 template<int FROM, int TO>
-void spliting_test(int numberofpoints) {
+void spliting_test(size_t numberofpoints) {
     int id = 0;
 
     voro::pre_container pre_con(FROM, TO, FROM, TO, FROM, TO, false, false, false);
 
-    for (int i = 0; i < numberofpoints; i++) {
+
+    for (size_t i = 0; i < numberofpoints; i++) {
         RandomPoint p(genNumber<FROM, TO>);
         pre_con.put(id, p.x, p.y, p.z);
     }
@@ -45,6 +47,7 @@ void spliting_test(int numberofpoints) {
     double x, y, z, r, rx, ry, rz;
     FILE *f1 = fopen("loops_test.gnu", "w");
     FILE *f2 = fopen("loops_test_points.gnu", "w");
+    FILE *f3 = fopen("loops_test_points_intr.gnu", "w");
     con.draw_particles(f2);
     con.draw_cells_gnuplot("random_points_v.gnu");
 
@@ -68,9 +71,10 @@ void spliting_test(int numberofpoints) {
                 if (con.compute_cell(c, cls)) {
                     sum_volume_subbox += c.volume();
                     sum_voronoi++;
-                    if (i.level_order != 4) { continue; }
+  //                  if (i.level_order != 0) { continue; }
                     cls.pos(x, y, z);
                     c.draw_gnuplot(x, y, z, f1);
+                    fprintf(f3, "%g %g %g\n", x, y, z);
                 } else {
                     sum_not_voronoi++;
                 }
@@ -79,7 +83,7 @@ void spliting_test(int numberofpoints) {
 
 
         std::cout << std::format("{:^5}{:^15}{:^15.5}{:^15}{:^15.3}%\n",
-                                 i.level_order, sum_voronoi, sum_volume_subbox, sum_not_voronoi,
+                                 0, sum_voronoi, sum_volume_subbox, sum_not_voronoi,
                                  sum_volume_subbox / (pow(TO - FROM, 3) / 8));
         sum_volume_all += sum_volume_subbox;
         sum_voronoi_all += sum_voronoi;
@@ -103,6 +107,6 @@ void spliting_test(int numberofpoints) {
 
 
 int main() {
-    for (int i: {30})
+    for (size_t i: {100})
         spliting_test<0, 10>(i);
 }
