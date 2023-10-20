@@ -12,8 +12,16 @@ Point::Point(double x, double y, double z) {
     this->z = z;
 };
 
-void Point::repr(){
-    std::cout << std::format("({},{},{}) \n", x,y,z);
+void Point::repr() {
+    std::cout << std::format("({},{},{}) \n", x, y, z);
+}
+
+double Point::distance(Point p) {
+    return std::sqrt(
+            std::pow(x - p.x, 2) +
+            std::pow(y - p.y, 2) +
+            std::pow(z - p.z, 2));
+
 }
 
 

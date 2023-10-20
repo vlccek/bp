@@ -13,12 +13,12 @@ using namespace voro;
 int main() {
     std::vector<Point> p;
 
-    for (int i = 0; i < 1000; i++) {
-        p.push_back(RandomPoint(&genNumber<0, 1000>));
+    for (int i = 0; i < 100; i++) {
+        p.push_back(RandomPoint(&genNumber<0, 10>));
         // std::cout << std::format("({},{},{})", p[p.size() - 1].x, p[p.size() - 1].y, p[p.size() - 1].z) << std::endl;
     }
 
-    HashOctree tree(p, {0, 0, 0}, {1000, 1000, 1000});
+    HashOctree tree(p, {0, 0, 0}, {10, 10, 10});
 
 
     return 0;
