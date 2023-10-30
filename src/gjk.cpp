@@ -1,9 +1,6 @@
-//
-// Created by jvlk on 19.10.23.
-//
 
-#include "bkj.h"
 
+#include "gjk.h"
 
 
 bool gjk(Box &b, Polyhedron *p) {
@@ -11,26 +8,37 @@ bool gjk(Box &b, Polyhedron *p) {
 
     std::vector<Point> simplex;
     Point a = support(b, p, direction);
-    simplex.push_back(a);
-    direction = a;
+    simplex.insert(simplex.begin(), a);
+    direction = -a;
 
     while (true) {
-        a = support(b, p, direction) - support(b, p, -direction);
-        if (a * direction < 0) {
+        a = support(b, p, direction);
+        if ((a * direction) < 0) {
+            auto ahoj = &p->vertexPoints;
+
+            if (b.isInside(ahoj)) {
+                std::cout << "is inside" << std::endl;
+
+            }
+            std::cout << std::format("false box: {} \n polyhedron: {}  \n", std::string(b), std::string(*p));
+
             return false;
         }
-        simplex.push_back(a);
+        simplex.insert(simplex.begin(), a);
 
         if (nextSimplex(simplex, direction)) {
+            std::cout << std::format("True box: {} \n polyhedron: {}  \n", std::string(b), std::string(*p));
+
             return true;
         }
+
     }
     return false;
 
 
 }
 
-bool sameDirection(const Point &direction, const Point &ao) {
+bool samedirection(const Point &direction, const Point &ao) {
     return (direction * ao) > 0;
 }
 
@@ -42,7 +50,7 @@ bool line(std::vector<Point> &simplex, Point &direction) {
     Point ab = b - a;
     Point a0 = -a;
 
-    if (sameDirection(ab, a0) > 0) {
+    if (samedirection(ab, a0)) {
         direction = cross(cross(ab, a0), ab);
     } else {
         simplex = {a};
@@ -63,18 +71,18 @@ bool triangle(std::vector<Point> &simplex, Point &direction) {
 
     Point abc = cross(ab, ac);
 
-    if (sameDirection(cross(abc, ac), ao) > 0) {
-        if ((ac * ao) > 0) {
+    if (samedirection(cross(abc, ac), ao)) {
+        if (samedirection(ac, ao)) {
             simplex = {a, c};
             direction = cross(cross(ac, ao), ac);
         } else {
             return line(simplex = {a, b}, direction);
         }
     } else {
-        if (sameDirection(cross(ab, abc), ao)) {
+        if (samedirection(cross(ab, abc), ao)) {
             return line(simplex = {a, b}, direction);
         } else {
-            if (sameDirection(abc, ao)) {
+            if (samedirection(abc, ao)) {
                 direction = abc;
             } else {
                 simplex = {a, c, b};
@@ -82,6 +90,7 @@ bool triangle(std::vector<Point> &simplex, Point &direction) {
             }
         }
     }
+
     return false;
 }
 
@@ -100,15 +109,15 @@ bool tetrahedron(std::vector<Point> &simplex, Point &direction) {
     Point acd = cross(ac, ad);
     Point adb = cross(ad, ab);
 
-    if (sameDirection(abc, ao)) {
+    if (samedirection(abc, ao)) {
         return triangle(simplex = {a, b, c}, direction);
     }
 
-    if (sameDirection(acd, ao)) {
+    if (samedirection(acd, ao)) {
         return triangle(simplex = {a, c, d}, direction);
     }
 
-    if (sameDirection(adb, ao)) {
+    if (samedirection(adb, ao)) {
         return triangle(simplex = {a, d, b}, direction);
     }
 
@@ -120,11 +129,14 @@ bool nextSimplex(std::vector<Point> &simplex, Point &direction) {
         case 2:
             return line(simplex, direction);
         case 3:
-            return triangle(simplex,direction);
+            return triangle(simplex, direction);
         case 4:
             return tetrahedron(simplex, direction);
     }
     return false;
 }
 
-Point support(Box &b, Polyhedron *p, Point d) { return b.futherPoint(d) - p->futherPoint(d); }
+Point support(Box &b, Polyhedron *p, Point d) {
+    auto minusd = -d;
+    return b.futherPoint(d) - p->futherPoint(minusd);
+}
