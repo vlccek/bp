@@ -2,6 +2,8 @@
 // Created by jvlk on 27.9.23.
 //
 #include <vector>
+#include <format>
+#include <string>
 
 #include "point.h"
 #include "voro++.hh"
@@ -19,7 +21,18 @@ public:
 
     Polyhedron(voro::voronoicell &vc, Point &p);
 
-    Point & futherPoint(Point &d);
+    Polyhedron(std::vector<Point> &vertext, Point &centerPoint);
+
+
+    operator std::string const() {
+        std::string s = "\n";
+        for (auto i: vertexPoints) {
+            s += std::format("\t({:.2f},{:.2f},{:.2f})\n", i.x, i.y, i.z);
+        }
+        return std::format("Vertex: {}", s);
+    }
+
+    Point &futherPoint(Point &d);
 };
 
 

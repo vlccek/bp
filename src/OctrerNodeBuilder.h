@@ -17,9 +17,11 @@
 #include "OctrerNodeBuilder.h"
 #include "box.h"
 #include "polyhedron.h"
-#include "bkj.h"
+#include "gjk.h"
 
-
+/**
+ * Class for building temporary tree for computing tree layout
+ */
 class OctrerNodeBuilder {
 
 public:
@@ -28,7 +30,7 @@ public:
     Box border = Box({0, 0, 0}, {0, 0, 0});
 
     std::vector<Polyhedron *> voronoiCells;
-    std::array<OctrerNodeBuilder *, 8> childs = {0}; // todo
+    std::array<OctrerNodeBuilder *, 8> childs = {0};
 
     inline void setBox(Point &min, Point &max) {
         border.min = min;

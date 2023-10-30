@@ -57,11 +57,25 @@ public:
         return false;
     }
 
+    inline bool isInside(Box &b) const {
+        auto vertex_of_box = b.allVertex();
+        return isInside(vertex_of_box);
+    }
+
     bool isInside(const std::vector<Point> *vertex);
 
     inline Point center() const {
-        return {min.x + max.x / 2, min.y + max.y / 2, min.y + max.y / 2};
+        Point edge = max - min;
+        return min + (edge / 2);
     }
+
+    auto operator==(const Box &b) const {
+        return (min == b.min && max == b.max);
+    }
+    explicit operator std::string () const {
+        return std::format("{} {} {} x {} {} {} ", min.x, min.y, min.z, max.x, max.y, max.z);
+    }
+
 
 
     inline bool intersectionWithBox(Box &b) {
@@ -84,12 +98,12 @@ std::vector<Box> splitboxby8(const Point &minP, const Point &maxP);
 
 class BoudingBox : public Box {
 
-public:
-    BoudingBox() : Box({0, 0, 0}, {0, 0, 0}) {};
+    public:
+        BoudingBox() : Box({0, 0, 0}, {0, 0, 0}) {};
 
-    explicit BoudingBox(std::vector<double> &d);
+        explicit BoudingBox(std::vector<double> &d);
 
-    explicit BoudingBox(std::vector<Point> &vertex);
-};
+        explicit BoudingBox(std::vector<Point> &vertex);
+    };
 
 #endif //BP_BOX_H

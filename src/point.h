@@ -4,6 +4,8 @@
 
 #include <compare>
 #include <cmath>
+#include <string>
+#include <format>
 
 class Point {
 public:
@@ -41,6 +43,29 @@ public:
 
     }
 
+    auto operator+(const Point &p) const {
+        return Point{
+                x + p.x,
+                y + p.y,
+                z + p.z
+        };
+
+    }
+
+    auto operator/(const double &p) const {
+        return Point{
+                x / p,
+                y / p,
+                z / p
+        };
+
+    }
+
+    operator std::string() const {
+        return std::format("({:2f},{:2f},{:2f})", x, y, z);
+    }
+
+
 /**
  * dot
  * @param p
@@ -72,11 +97,12 @@ public:
 
 
 inline Point cross(const Point &p1, const Point &p2) {
-    return Point(
-            p1.y * p2.z - p1.z * p2.y,
-            p1.z * p2.x - p1.x * p2.z,
-            p1.x * p2.y - p1.y * p2.x
-    );
+    return {
+            (p1.y * p2.z) - (p1.z * p2.y),
+            (p1.z * p2.x) - (p1.x * p2.z),
+            (p1.x * p2.y) - (p1.y * p2.x)
+    };
 }
+
 
 #endif

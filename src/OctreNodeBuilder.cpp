@@ -24,7 +24,7 @@ void OctrerNodeBuilder::buildTree() {
 
             // center point of voronoi cell
             auto box = splitedBox[l];
-
+#if 1
             // is particle in BOX ?
             if (box.isInside(particle)) {
                 alocateIfNeccesary(l, box);
@@ -39,6 +39,20 @@ void OctrerNodeBuilder::buildTree() {
                 childs[l]->addVoroCell(ph);
                 continue;
             }
+#endif
+
+            // check by bounding box
+            auto boudingboxVertexs = ph->boudingBox.allVertex();
+            //check if bounding box interferes to the box
+            if (box.isInside(boudingboxVertexs)) {
+                // use gjk algorithm to detect intersection
+                if (gjk(box, ph)) {
+                    alocateIfNeccesary(l, box);
+                    childs[l]->addVoroCell(ph);
+                    continue;
+                }
+            }
+
 
         }
         if (childs[l] != nullptr && childs[l]->voronoiCells.size() >= 5) // todo remove magic constant
