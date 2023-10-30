@@ -6,9 +6,6 @@ set(CMAKE_CXX_STANDARD 20)
 option(MyOption "merlin" OFF) # use static linking for glbc/c++ because merging dont have right version for c++20
 
 
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
-#set(CMAKE_CXX_FLAGS_DEBUG  "-Wall -Wextra -pedantic")
-
 include_directories(src)
 
 # add voro lib
@@ -17,12 +14,21 @@ include_directories(deps/voro)
 
 add_subdirectory(playground)
 
+add_subdirectory(deps/googletest)
+include_directories(deps/googletest)
+
+add_subdirectory(deps/benchmark)
+include_directories(deps/benchmark)
+add_subdirectory(benchmark)
+
+add_subdirectory(test)
+
 find_package(OpenMP)
 if (OPENMP_FOUND)
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-    set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
-endif()
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+endif ()
 
 
 # For creating staticly linked (merlin)
@@ -43,7 +49,7 @@ add_library(hashoctree
         src/OctrerNodeBuilder.h
         src/box.cpp
         src/polyhedron.cpp
-        src/bkj.cpp
+        src/gjk.cpp
 )
 
 target_link_libraries(hashoctree voro++)
