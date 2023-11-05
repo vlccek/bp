@@ -86,7 +86,4 @@ TEST(GJKTest, Collision2) {
     EXPECT_TRUE(gjk(box, &polyhedron));
 }
 
-int main(int argc, char **argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
+

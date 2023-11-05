@@ -5,7 +5,13 @@
 #include "OctrerNodeBuilder.h"
 
 
-OctrerNodeBuilder::OctrerNodeBuilder() {
+OctrerNodeBuilder::OctrerNodeBuilder(int level, int *maxLevel) {
+    this->maxLevel = maxLevel;
+    this->level = level;
+
+    if (level > *maxLevel) {
+        *maxLevel = level;
+    }
     voronoiCells = {};
 }
 
@@ -40,7 +46,7 @@ void OctrerNodeBuilder::buildTree() {
                 continue;
             }
 #endif
-
+#if 0
             // check by bounding box
             auto boudingboxVertexs = ph->boudingBox.allVertex();
             //check if bounding box interferes to the box
@@ -52,7 +58,7 @@ void OctrerNodeBuilder::buildTree() {
                     continue;
                 }
             }
-
+#endif
 
         }
         if (childs[l] != nullptr && childs[l]->voronoiCells.size() >= 5) // todo remove magic constant
@@ -68,9 +74,34 @@ void OctrerNodeBuilder::buildTree() {
 
 void OctrerNodeBuilder::alocateIfNeccesary(int index, Box &b) {
     if (childs[index] == nullptr) {
-        childs[index] = new OctrerNodeBuilder();
+        childCount++;
+        childs[index] = new OctrerNodeBuilder(level + 1, maxLevel);
         childs[index]->border = b;
     }
 
 }
+
+void OctrerNodeBuilder::getLeafs(std::vector<OctrerNodeBuilder *> &leafs) {
+    for (auto &child: childs) {
+        if (child != nullptr) {
+            if (child->childCount == 0) {
+                leafs.push_back(child);
+                continue;
+            } else {
+                child->getLeafs(leafs);
+            }
+        }
+    }
+}
+
+OctrerNodeBuilder::~OctrerNodeBuilder() {
+    for (auto &child: childs) {
+        if (child != nullptr) {
+            delete child;
+        }
+    }
+
+}
+
+
 

@@ -11,7 +11,6 @@
 #include <format>
 #include <iostream>
 #include "voro++.hh"
-#include <omp.h>
 
 #include "point.h"
 #include "OctrerNodeBuilder.h"
@@ -25,9 +24,14 @@
 class OctrerNodeBuilder {
 
 public:
-    OctrerNodeBuilder();
+    explicit OctrerNodeBuilder(int level, int *maxLevel);
 
     Box border = Box({0, 0, 0}, {0, 0, 0});
+
+    int childCount = 0;
+    int level;
+    int *maxLevel;
+
 
     std::vector<Polyhedron *> voronoiCells;
     std::array<OctrerNodeBuilder *, 8> childs = {0};
@@ -42,6 +46,10 @@ public:
     void alocateIfNeccesary(int index, Box &b);
 
     void addVoroCell(Polyhedron *vc);
+
+    void getLeafs(std::vector<OctrerNodeBuilder *> &leafs);
+
+    ~OctrerNodeBuilder();
 
 };
 

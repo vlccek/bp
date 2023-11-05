@@ -15,6 +15,7 @@
 #include <array>
 #include <tuple>
 #include <chrono>
+#include <unordered_map>
 
 #include "point.h"
 #include "voro++.hh"
@@ -22,10 +23,31 @@
 #include "polyhedron.h"
 #include "gjk.h"
 
+template<>
+struct std::hash<std::pair<int, std::tuple<int, int, int>>> {
+    std::size_t operator()(const std::pair<int, std::tuple<int, int, int>> &k) const {
+        using std::size_t;
+        using std::hash;
+        using std::string;
+
+        // Compute individual hash values for first,
+        // second and third and combine them using XOR
+        // and bit shifting:
+
+        return (
+                (hash<int>()(k.first)
+                 ^ (hash<int>()(std::get<0>(k.second) << 1) >> 1)
+                 ^ (hash<int>()(std::get<1>(k.second) << 1) >> 1)
+                 ^ (hash<int>()(std::get<2>(k.second) << 1) >> 1)
+                ));
+    }
+};
+
 
 class HashOctree {
-    OctrerNodeBuilder *root = new OctrerNodeBuilder();
+    OctrerNodeBuilder *root = new OctrerNodeBuilder(0, &maxLevel);
     std::vector<Polyhedron> voronoiCells;
+    int maxLevel = 0;
 public:
 
     Point min;
@@ -48,6 +70,10 @@ public:
      */
     HashOctree(std::vector<Point> &p, const Point &min, const Point &max);
 
+    ~HashOctree() {
+        delete root;
+    }
+
     inline void split_and_enqueue(const Point &min, const Point &max, std::queue<Box> &q);
 
     bool isPointInBox(std::vector<double> &v, Box &b);
@@ -57,6 +83,37 @@ public:
     void initTree();
 
     void buildTree();
+
+    void buildHashTable();
+
+    void printHashTable();
+
+
+    inline int findBellogingInterval(double p, int boxCount) {
+        double edgeLen = (max.x - min.x) / boxCount;
+        return (int) (edgeLen / boxCount);
+    }
+
+    std::tuple<int, int, int> findBellogingIntervals(Point &p, int boxCount) const;
+
+
+    /**
+     * Find the closes point to the given point
+     * Steps:
+     *  1) find id of voxel in witch is point P
+     *  1a)
+     *  2) TODO
+     * @param p point
+     * @return the closes point
+     */
+    Point nn(Point &p);
+
+    static Point findClosesPointInNode(Point &p, OctrerNodeBuilder *node);
+
+private:
+    std::unordered_map<std::pair<int, std::tuple<int, int, int>>, OctrerNodeBuilder *> hashTable{
+    };
+    int pointCount = 0;
 
 };
 

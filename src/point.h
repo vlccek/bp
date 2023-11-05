@@ -15,6 +15,7 @@ public:
 
     Point(double x, double y, double z);
 
+
     void repr();
 
 
@@ -58,7 +59,14 @@ public:
                 y / p,
                 z / p
         };
+    }
 
+    auto operator*(const long &p) const {
+        return Point{
+                x * p,
+                y * p,
+                z * p
+        };
     }
 
     operator std::string() const {

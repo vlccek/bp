@@ -9,14 +9,12 @@ HashOctree::HashOctree(std::vector<Point> &p, const Point &min,
                        const Point &max) : min(min), max(max) {
 
     voro::pre_container pre_con(min.x, max.x, min.y, max.y, min.z, max.z, false, false, false);
-
+    pointCount = (p.size());
 
     int id = 0;
     for (auto i: p) {
         pre_con.put(id++, i.x, i.y, i.z);
     }
-    std::cout << "Points inserted \n";
-
 
     voro::container con(min.x, max.x, min.y, max.y, min.z, max.z, 6, 6, 6, false, false,
                         false, 8);
@@ -43,12 +41,10 @@ HashOctree::HashOctree(std::vector<Point> &p, const Point &min,
         } while (cls.inc());
 
         initTree();
-        std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-        root->buildTree();
-        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
-        std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
-        std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::seconds> (end - begin).count() << "[s]" << std::endl;
+        buildTree();
+
+        buildHashTable();
     }
 }
 
@@ -62,6 +58,95 @@ void HashOctree::initTree() {
 
 void HashOctree::buildTree() {
     root->buildTree();
+}
+
+void HashOctree::buildHashTable() {
+    std::vector<OctrerNodeBuilder *> leafs;
+    root->getLeafs(leafs);
+
+
+    for (auto i: leafs) {
+        auto p = findBellogingIntervals(i->border.min, i->level * 2);
+        hashTable[std::make_pair(i->level, p)] = i;
+    }
+}
+
+
+Point HashOctree::nn(Point &p) {
+    if (pointCount < (8 * 4) + 1) { // todo add connection to max number of points in node
+        return findClosesPointInNode(p, root);
+    }
+
+    int lmin = 1;
+    int lmax = maxLevel;
+    int lc;
+
+    std::tuple<int, int, int> idx = {0, 0, 0};
+
+
+    while (lmin < lmax && lmin != lc) {
+        lc = (lmax + lmin) / 2;
+        idx = findBellogingIntervals(p, lc * 2);
+        auto iterator = hashTable.find(std::make_pair(lc, idx));
+        if (iterator != hashTable.end()) { // node does exists
+            lmin = lc;
+            // change range to [lc, lmax]
+        } else {// node does not exists
+            lmax = lc - 1;
+            // change range to [lmin, lc - 1]
+
+        }
+    }
+    idx = findBellogingIntervals(p, lc * 2);
+    auto iterator = hashTable.find(std::make_pair(lmin, idx));
+
+    if (iterator == hashTable.end()) {
+        std::cerr << std::format("not found: ({},{},{})", p.x, p.y, p.z) << std::endl;
+        return {0, 0, 0};
+    }
+
+    return findClosesPointInNode(p, iterator->second); // find closes point in selected mode
+}
+
+Point HashOctree::findClosesPointInNode(Point &p, OctrerNodeBuilder *node) {
+    double smallestDistance = std::numeric_limits<double>::max();
+    Point *closesPoint;
+    for (auto &i: node->voronoiCells) {
+        auto distance = i->p.distance(p);
+        if (smallestDistance > distance) {
+            smallestDistance = distance;
+            closesPoint = &i->p;
+        }
+    }
+    return *closesPoint;
+}
+
+
+std::tuple<int, int, int> HashOctree::findBellogingIntervals(Point &p, int boxCount) const {
+    return std::make_tuple(
+            // if the point is on the edge of the box, then it is in the last box
+            static_cast<int> (((p.x - min.x) * boxCount == boxCount) ? boxCount - 1 : (p.x - min.x) * boxCount),
+            static_cast<int> (((p.y - min.y) * boxCount == boxCount) ? boxCount - 1 : (p.y - min.y) * boxCount),
+            static_cast<int> (((p.z - min.z) * boxCount == boxCount) ? boxCount - 1 : (p.z - min.z) * boxCount)
+    );
+}
+
+void HashOctree::printHashTable() {
+
+    for (auto &[key, value]: hashTable) {
+        std::cout
+                << std::format("({},({},{},{})) ---> ( \n", key.first, std::get<0>(key.second), std::get<1>(key.second),
+                               std::get<2>(key.second));
+        for (auto j: value->voronoiCells) {
+            std::cout << std::format("      ({:.2f},{:.2f},{:.2f})", j->p.x, j->p.y, j->p.z);
+            std::cout << "\n";
+
+
+        }
+        //  std::cout << std::format("{:2f},{:2f},{:2f}", value->border.min.x, value->border.min.y, value->border.min.z);
+        std::cout << " )" << std::endl;
+    }
+
 }
 
 
