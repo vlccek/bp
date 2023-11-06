@@ -94,6 +94,10 @@ public:
         return (int) (edgeLen / boxCount);
     }
 
+    inline const OctrerNodeBuilder *getRoot() {
+        return root;
+    }
+
     std::tuple<int, int, int> findBellogingIntervals(Point &p, int boxCount) const;
 
 
@@ -108,13 +112,14 @@ public:
      */
     Point nn(Point &p);
 
-    static Point findClosesPointInNode(Point &p, OctrerNodeBuilder *node);
+    static Point findClosesPointInNode(Point &p, const OctrerNodeBuilder *node);
 
 private:
     std::unordered_map<std::pair<int, std::tuple<int, int, int>>, OctrerNodeBuilder *> hashTable{
     };
     int pointCount = 0;
 
+    static void printNodePoints(OctrerNodeBuilder *value);
 };
 
 

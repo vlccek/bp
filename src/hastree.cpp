@@ -73,9 +73,11 @@ void HashOctree::buildHashTable() {
 
 
 Point HashOctree::nn(Point &p) {
+#if 0
     if (pointCount < (8 * 4) + 1) { // todo add connection to max number of points in node
         return findClosesPointInNode(p, root);
     }
+#endif
 
     int lmin = 1;
     int lmax = maxLevel;
@@ -98,17 +100,19 @@ Point HashOctree::nn(Point &p) {
         }
     }
     idx = findBellogingIntervals(p, lc * 2);
-    auto iterator = hashTable.find(std::make_pair(lmin, idx));
+    auto iterator = hashTable.find(std::make_pair(lc, idx));
 
     if (iterator == hashTable.end()) {
         std::cerr << std::format("not found: ({},{},{})", p.x, p.y, p.z) << std::endl;
         return {0, 0, 0};
     }
 
+    // printNodePoints(iterator->second);
+
     return findClosesPointInNode(p, iterator->second); // find closes point in selected mode
 }
 
-Point HashOctree::findClosesPointInNode(Point &p, OctrerNodeBuilder *node) {
+Point HashOctree::findClosesPointInNode(Point &p, const OctrerNodeBuilder *node) {
     double smallestDistance = std::numeric_limits<double>::max();
     Point *closesPoint;
     for (auto &i: node->voronoiCells) {
@@ -118,6 +122,7 @@ Point HashOctree::findClosesPointInNode(Point &p, OctrerNodeBuilder *node) {
             closesPoint = &i->p;
         }
     }
+    // std::cerr << std::format("found: ({},{},{}), distance: {}", closesPoint->x, closesPoint->y, closesPoint->z, smallestDistance) << std::endl;
     return *closesPoint;
 }
 
@@ -137,16 +142,20 @@ void HashOctree::printHashTable() {
         std::cout
                 << std::format("({},({},{},{})) ---> ( \n", key.first, std::get<0>(key.second), std::get<1>(key.second),
                                std::get<2>(key.second));
-        for (auto j: value->voronoiCells) {
-            std::cout << std::format("      ({:.2f},{:.2f},{:.2f})", j->p.x, j->p.y, j->p.z);
-            std::cout << "\n";
-
-
-        }
+        printNodePoints(value);
         //  std::cout << std::format("{:2f},{:2f},{:2f}", value->border.min.x, value->border.min.y, value->border.min.z);
         std::cout << " )" << std::endl;
     }
 
+}
+
+void HashOctree::printNodePoints(OctrerNodeBuilder *value) {
+    for (auto j: value->voronoiCells) {
+        std::cout << std::format("      ({:.2f},{:.2f},{:.2f})", j->p.x, j->p.y, j->p.z);
+        std::cout << "\n";
+
+
+    }
 }
 
 

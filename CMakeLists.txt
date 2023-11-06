@@ -5,15 +5,6 @@ set(CMAKE_CXX_STANDARD 20)
 
 option(MERLIN "static link all libs" OFF) # use static linking for glbc/c++ because merging dont have right version for c++20
 
-option(BUILD_TESTS "build tests" OFF)
-option(BUILD_BENCHMARK "build benchmark" OFF)
-option(BUILD_ALL "build all" OFF)
-
-if (BUILD_ALL)
-    set(BUILD_TESTS ON)
-    set(BUILD_BENCHMARK ON)
-endif ()
-
 include_directories(src)
 
 # add voro lib
@@ -22,19 +13,15 @@ include_directories(deps/voro)
 
 add_subdirectory(playground)
 
-if (BUILD_TESTS)
-    if (BUILD_BENCHMARK)
-        add_subdirectory(deps/googletest)
-        include_directories(deps/googletest)
-    endif ()
-    add_subdirectory(test)
-endif ()
 
-if (BUILD_BENCHMARK)
-    add_subdirectory(deps/benchmark)
-    include_directories(deps/benchmark)
-    add_subdirectory(benchmark)
-endif ()
+add_subdirectory(deps/googletest)
+include_directories(deps/googletest)
+add_subdirectory(test)
+
+
+add_subdirectory(deps/benchmark)
+include_directories(deps/benchmark)
+add_subdirectory(benchmark)
 
 if (MERLIN)
     message("merlin")
@@ -44,8 +31,8 @@ if (MERLIN)
 endif ()
 
 
-#add_compile_options(-fsanitize=address)
-#add_link_options(-fsanitize=address)
+# add_compile_options(-fsanitize=address)
+# add_link_options(-fsanitize=address)
 
 add_library(hashoctree
         src/point.cpp
