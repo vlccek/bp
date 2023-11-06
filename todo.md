@@ -1,6 +1,9 @@
 ## Co je potřeba (asi) udělat
 - napsat si vlastní voronoi gen, použít testy - porovonání s voro++
-- bylo by fajn abych nemusel tak retardovaně psát .h pro deps
+  - skipnutelne voro je rychle 
+  - ztráta času
+- dopsat GJK je možné že to dojebava potom přesnost při hraniční případech
+- přepsat průchod přes při vytváření stromu algoritmus na "průchod přes sousedy"
 
 
 ## abiciozní:
