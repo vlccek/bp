@@ -73,6 +73,9 @@ public:
         return std::format("({:2f},{:2f},{:2f})", x, y, z);
     }
 
+    auto operator<<(std::ostream &os) const {
+        os << std::format("({:2f},{:2f},{:2f})", x, y, z);
+    }
 
 /**
  * dot

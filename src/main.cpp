@@ -15,19 +15,19 @@ int main() {
             Point(0, 0, 0.99)
     };
 
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 1024; i++) {
         p.push_back(RandomPoint(&genNumber<0, 1>));
-        // std::cout << std::format("({},{},{})", p[p.size() - 1].x, p[p.size() - 1].y, p[p.size() - 1].z) << std::endl;
     }
 
 
     HashOctree tree(p, {0, 0, 0}, {1, 1, 1});
 
 
-    auto point = Point(0, 0, 0.95);
+    auto point = Point(0, 0, 0.99);
     Point pica(0, 0, 0);
-    for (int i = 0; i < 1221510; i++)
-        pica = tree.nn(point);
+    pica = tree.nn(point);
+    auto pica2 = tree.nn(p[1]);
+    auto pica3 = tree.nn(p[2]);
 
     std::cout << std::format("({},{},{})", pica.x, pica.y, pica.z) << std::endl;
 
