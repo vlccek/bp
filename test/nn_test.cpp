@@ -36,7 +36,7 @@ TEST_P(TreeWithNPoint, TestIfNNNotreturnNotFound) {
 
 INSTANTIATE_TEST_SUITE_P(numberOfPoints,
                          TreeWithNPoint,
-                         ::testing::Values(100, 1000, 10000)
+                         ::testing::Values(100, 1000, 10000, 100000, 1000000)
 );
 
 
