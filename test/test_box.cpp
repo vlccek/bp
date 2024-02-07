@@ -106,6 +106,7 @@ TEST_P(boxSplitTest, postiveNumber) {
     EXPECT_EQ(splitedbox.size(), 0);
 }
 
+
 TEST_P(boxSplitTest, negativeNumber) {
     double min = GetParam().first * (-1);
     double max = GetParam().second * (-1);
@@ -140,7 +141,8 @@ INSTANTIATE_TEST_SUITE_P(PositiveNumber,
                                  std::pair<double, double>{0, 2},
                                  std::pair<double, double>{10, 20},
                                  std::pair<double, double>{100, 200},
-                                 std::pair<double, double>{111.50, 200.5}
+                                 std::pair<double, double>{111.50, 200.5},
+                                 std::pair<double, double>{0.00000, 0.000000006}
 
                          )
 );

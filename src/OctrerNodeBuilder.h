@@ -7,9 +7,11 @@
 
 
 #include <vector>
+#include <set>
 #include <array>
 #include <format>
 #include <iostream>
+#include <fstream>
 #include "voro++.hh"
 
 #include "point.h"
@@ -49,8 +51,11 @@ public:
 
     void getLeafs(std::vector<OctrerNodeBuilder *> &leafs);
 
+    void printVoronoiCells(std::ofstream &file);
+
     ~OctrerNodeBuilder();
 
+    void getAllNodes(std::set<OctrerNodeBuilder *> &allNodes);
 };
 
 

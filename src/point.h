@@ -97,7 +97,7 @@ public:
     }
 
 
-    double distance(Point p);
+    double distance(Point p) const;
 
 
     auto operator==(const Point &p) const {

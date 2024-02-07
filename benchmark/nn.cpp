@@ -4,18 +4,22 @@
 #include "randompoint.h"
 #include "hastree.h"
 
+
+// https://github.com/google/benchmark/issues/1217
 static void basicnn(benchmark::State &state) {
     std::vector<Point> p{
             Point(0, 0, .95)
     };
+    constexpr int from = 0;
+    constexpr int to = 1;
 
 
     for (int i = 0; i < state.range(0); i++) {
-        p.push_back(RandomPoint(&genNumber<0, 1>));
+        p.push_back(RandomPoint(&genNumber<from, to>));
         // std::cout << std::format("({},{},{})", p[p.size() - 1].x, p[p.size() - 1].y, p[p.size() - 1].z) << std::endl;
     }
 
-    HashOctree tree(p, {0, 0, 0}, {1, 1, 1});
+    HashOctree tree(p, from, to);
 
     auto point = Point(0, 0, .99);
 

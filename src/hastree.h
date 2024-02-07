@@ -14,6 +14,7 @@
 #include <format>
 #include <array>
 #include <tuple>
+#include <set>
 #include <chrono>
 #include <unordered_map>
 
@@ -48,6 +49,7 @@ class HashOctree {
     OctrerNodeBuilder *root = new OctrerNodeBuilder(0, &maxLevel);
     std::vector<Polyhedron> voronoiCells;
     int maxLevel = 0;
+    int minLeafLevel = 0;
 public:
 
     Point min;
@@ -70,6 +72,8 @@ public:
      */
     HashOctree(std::vector<Point> &p, const Point &min, const Point &max);
 
+    HashOctree(std::vector<Point> &p, const double min, const double max);
+
     ~HashOctree() {
         delete root;
     }
@@ -88,17 +92,22 @@ public:
 
     void printHashTable();
 
+    std::vector<OctrerNodeBuilder *> getLeafs();
+    std::set<OctrerNodeBuilder *> getAllNodes();
 
-    inline int findBellogingInterval(double p, int boxCount) {
+
+    inline int findBellogingInterval(double const p, int boxCount) const {
         double edgeLen = (max.x - min.x) / boxCount;
-        return (int) (edgeLen / boxCount);
+        return (int) (edgeLen * boxCount);
     }
 
     inline const OctrerNodeBuilder *getRoot() {
         return root;
     }
 
-    std::tuple<int, int, int> findBellogingIntervals(Point &p, int boxCount) const;
+    std::tuple<int, int, int> findBellogingIntervals(Point const &p, int boxCount) const;
+
+    inline std::tuple<int, int, int> findBellogingIntervalsByLevel(Point const &p, int level) const;
 
 
     /**
@@ -121,6 +130,26 @@ private:
 
     static void printNodePoints(OctrerNodeBuilder *value);
 };
+
+
+inline std::tuple<int, int, int> HashOctree::findBellogingIntervals(Point const &p, int boxCount) const {
+    return std::make_tuple(
+            // if the point is on the edge of the box, then it is in the last box
+            static_cast<int> (((p.x - min.x) * boxCount == boxCount) ? boxCount - 1 : (p.x - min.x) * boxCount),
+            static_cast<int> (((p.y - min.y) * boxCount == boxCount) ? boxCount - 1 : (p.y - min.y) * boxCount),
+            static_cast<int> (((p.z - min.z) * boxCount == boxCount) ? boxCount - 1 : (p.z - min.z) * boxCount)
+    );
+}
+
+inline std::tuple<int, int, int> HashOctree::findBellogingIntervalsByLevel(Point const &p, int level) const {
+    int boxCount = 1 << (level);
+    return std::make_tuple(
+            // if the point is on the edge of the box, then it is in the last box
+            static_cast<int> (((p.x - min.x) * boxCount == boxCount) ? boxCount - 1 : (p.x - min.x) * boxCount),
+            static_cast<int> (((p.y - min.y) * boxCount == boxCount) ? boxCount - 1 : (p.y - min.y) * boxCount),
+            static_cast<int> (((p.z - min.z) * boxCount == boxCount) ? boxCount - 1 : (p.z - min.z) * boxCount)
+    );
+}
 
 
 #endif //BP_HASTREE_H

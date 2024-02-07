@@ -15,7 +15,7 @@ int main() {
             Point(0, 0, 0.99)
     };
 
-    for (int i = 0; i < 1024; i++) {
+    for (int i = 0; i < 20; i++) {
         p.push_back(RandomPoint(&genNumber<0, 1>));
     }
 
@@ -23,7 +23,7 @@ int main() {
     HashOctree tree(p, {0, 0, 0}, {1, 1, 1});
 
 
-    auto point = Point(0, 0, 0.99);
+    auto point = Point(0.4939766852066831,0.31903294108545305,0.5045228949346109);
     Point pica(0, 0, 0);
     pica = tree.nn(point);
     auto pica2 = tree.nn(p[1]);

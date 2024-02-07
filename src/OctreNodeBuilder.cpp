@@ -20,6 +20,11 @@ void OctrerNodeBuilder::addVoroCell(Polyhedron *vc) {
 }
 
 void OctrerNodeBuilder::buildTree() {
+    if (level > 1000 && (border.min - border.max < Point{0.00001, 0.00001, 0.00001})) {
+        std::cout << "Unable to build tree becouse the region is too small" << std::endl;
+// todo remove this
+        return;
+    }
     std::vector<Box> splitedBox = border.splitBoxBy8();
     int l;
     for (l = 0; l < splitedBox.size(); ++l) {
@@ -46,21 +51,29 @@ void OctrerNodeBuilder::buildTree() {
                 continue;
             }
 #endif
-#if 0
+#if 1
             // check by bounding box
             auto boudingboxVertexs = ph->boudingBox.allVertex();
             //check if bounding box interferes to the box
             if (box.isInside(boudingboxVertexs)) {
                 // use gjk algorithm to detect intersection
+#if 1
+                alocateIfNeccesary(l, box);
+                childs[l]->addVoroCell(ph);
+                continue;
+#else
                 if (gjk(box, ph)) {
                     alocateIfNeccesary(l, box);
                     childs[l]->addVoroCell(ph);
                     continue;
                 }
+#endif
             }
 #endif
 
         }
+
+
         if (childs[l] != nullptr && childs[l]->voronoiCells.size() >= 5) // todo remove magic constant
         {
             childs[l]->buildTree();
@@ -94,6 +107,10 @@ void OctrerNodeBuilder::getLeafs(std::vector<OctrerNodeBuilder *> &leafs) {
     }
 }
 
+
+
+
+
 OctrerNodeBuilder::~OctrerNodeBuilder() {
     for (auto &child: childs) {
         if (child != nullptr) {
@@ -103,5 +120,25 @@ OctrerNodeBuilder::~OctrerNodeBuilder() {
 
 }
 
+void OctrerNodeBuilder::printVoronoiCells(std::ofstream &file) {
+    for (auto &vc: voronoiCells) {
+        // file << vc->p.operator std::string() << std::endl;
+        for (auto &p : vc->vertexPoints) {
+            file << p.operator std::string() << std::endl;
+        }
+        file << std::endl;  // empty line
+    }
+}
+
+void OctrerNodeBuilder::getAllNodes(std::set<OctrerNodeBuilder *> &allNodes) {
+    for (auto child: childs) {
+        if (child == nullptr) {
+            continue;
+        }
+        allNodes.insert(child);
+        // todo add comdiotn if in allNodes is already all nodes dont need to iterate through all nodes
+        child->getAllNodes(allNodes);
+    }
+}
 
 

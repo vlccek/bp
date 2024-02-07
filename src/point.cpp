@@ -16,7 +16,7 @@ void Point::repr() {
     std::cout << std::format("({},{},{}) \n", x, y, z);
 }
 
-double Point::distance(Point p) {
+double Point::distance(Point p) const {
     return std::sqrt(
             std::pow(x - p.x, 2) +
             std::pow(y - p.y, 2) +

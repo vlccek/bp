@@ -27,7 +27,7 @@ if (MERLIN)
     message("merlin")
     set(BUILD_SHARED_LIBS OFF)
     set(CMAKE_EXE_LINKER_FLAGS "-static")
-
+    set(CMAKE_CXX_FLAGS " -static -static-libgcc -static-libstdc++ -std=c++20")
 endif ()
 
 

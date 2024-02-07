@@ -48,6 +48,11 @@ HashOctree::HashOctree(std::vector<Point> &p, const Point &min,
     }
 }
 
+HashOctree::HashOctree(std::vector<Point> &p, const double min, const double max) : HashOctree(p, Point(min, min, min),
+                                                                                               Point(max, max, max)) {
+//empty
+}
+
 
 void HashOctree::initTree() {
     for (int i = 0; i < voronoiCells.size(); ++i) {
@@ -61,12 +66,11 @@ void HashOctree::buildTree() {
 }
 
 void HashOctree::buildHashTable() {
-    std::vector<OctrerNodeBuilder *> leafs;
-    root->getLeafs(leafs);
+    std::set<OctrerNodeBuilder *> allNodes;
+    root->getAllNodes(allNodes);
 
-
-    for (auto i: leafs) {
-        auto p = findBellogingIntervals(i->border.min, i->level * 2);
+    for (auto i: allNodes) {
+        auto p = findBellogingIntervalsByLevel(i->border.center(), i->level);
         hashTable[std::make_pair(i->level, p)] = i;
     }
 }
@@ -79,16 +83,16 @@ Point HashOctree::nn(Point &p) {
     }
 #endif
 
-    int lmin = 1;
+    int lmin = 0; // minimal leaf node level
     int lmax = maxLevel;
     int lc;
 
     std::tuple<int, int, int> idx = {0, 0, 0};
 
 
-    while (lmin < lmax && lmin != lc) {
+    while (lmax - lmin > 1) {
         lc = (lmax + lmin) / 2;
-        idx = findBellogingIntervals(p, lc * 2);
+        idx = findBellogingIntervalsByLevel(p, lc);
         auto iterator = hashTable.find(std::make_pair(lc, idx));
         if (iterator != hashTable.end()) { // node does exists
             lmin = lc;
@@ -99,16 +103,19 @@ Point HashOctree::nn(Point &p) {
 
         }
     }
-    idx = findBellogingIntervals(p, lc * 2);
-    auto iterator = hashTable.find(std::make_pair(lc, idx));
 
+    lc = (lmax + lmin) / 2;
+    idx = findBellogingIntervalsByLevel(p, lc);
+    auto iterator = hashTable.find(std::make_pair(lc, idx));
+#if 0
     if (iterator == hashTable.end()) {
-        std::cerr << std::format("not found: ({},{},{})", p.x, p.y, p.z) << std::endl;
-        return {0, 0, 0};
-    }
+
+            std::cerr << std::format("not found: ({},{},{})", p.x, p.y, p.z) << std::endl;
+            return {0, 0, 0};
+        }
+#endif
 
     // printNodePoints(iterator->second);
-
     return findClosesPointInNode(p, iterator->second); // find closes point in selected mode
 }
 
@@ -122,19 +129,10 @@ Point HashOctree::findClosesPointInNode(Point &p, const OctrerNodeBuilder *node)
             closesPoint = &i->p;
         }
     }
-    // std::cerr << std::format("found: ({},{},{}), distance: {}", closesPoint->x, closesPoint->y, closesPoint->z, smallestDistance) << std::endl;
+    // std::cerr << std::format("for ({},{},{}), found: ({},{},{}), distance: {}", p.x,p.y,p.z, closesPoint->x, closesPoint->y, closesPoint->z,smallestDistance) << std::endl;
     return *closesPoint;
 }
 
-
-std::tuple<int, int, int> HashOctree::findBellogingIntervals(Point &p, int boxCount) const {
-    return std::make_tuple(
-            // if the point is on the edge of the box, then it is in the last box
-            static_cast<int> (((p.x - min.x) * boxCount == boxCount) ? boxCount - 1 : (p.x - min.x) * boxCount),
-            static_cast<int> (((p.y - min.y) * boxCount == boxCount) ? boxCount - 1 : (p.y - min.y) * boxCount),
-            static_cast<int> (((p.z - min.z) * boxCount == boxCount) ? boxCount - 1 : (p.z - min.z) * boxCount)
-    );
-}
 
 void HashOctree::printHashTable() {
 
@@ -157,6 +155,24 @@ void HashOctree::printNodePoints(OctrerNodeBuilder *value) {
 
     }
 }
+
+std::vector<OctrerNodeBuilder *> HashOctree::getLeafs() {
+    std::vector<OctrerNodeBuilder *> leafs;
+    root->getLeafs(leafs);
+    return leafs;
+}
+
+std::set<OctrerNodeBuilder *> HashOctree::getAllNodes() {
+    std::set<OctrerNodeBuilder *> allNodes;
+    root->getAllNodes(allNodes);
+
+    return allNodes;
+}
+
+
+
+
+
 
 
 
