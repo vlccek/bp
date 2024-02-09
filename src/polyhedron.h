@@ -19,7 +19,7 @@ public:
     std::vector<Point> vertexPoints; // list of all vertex
     BoudingBox boudingBox;
 
-    Polyhedron(voro::voronoicell &vc, Point &p);
+    Polyhedron(voro::voronoicell_3d &vc, Point &p);
 
     Polyhedron(std::vector<Point> &vertext, Point &centerPoint);
 

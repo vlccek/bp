@@ -5,17 +5,15 @@
 #include "randompoint.h"
 
 static void vorocell_computation_pre(benchmark::State &state) {
-    voro::pre_container pre_con(-10, 10, -10, 10, -10, 10, false, false, false);
+    voro::container_3d con(-10, 10, -10, 10, -10, 10, 26, 26, 26, false, false, false, 8);
 
     for (int i = 0; i < state.range(0); i++) {
         RandomPoint p(genNumber<-10, 10>);
-        pre_con.put(i, p.x, p.y, p.z);
+        con.put(i, p.x, p.y, p.z);
     }
 
-    voro::container con(-10, 10, -10, 10, -10, 10, 1, 1, 1, false, false, false, 1);
-    pre_con.setup(con);
 
-    voro::voronoicell c;
+    voro::voronoicell_3d c;
 
 
     for (auto _: state)
@@ -32,7 +30,8 @@ BENCHMARK(vorocell_computation_pre)
 
 // create a simular benchmark for computing vorocell with using just container class
 static void vorocell_computation(benchmark::State &state) {
-    voro::container con(-10, 10, -10, 10, -10, 10, 1, 1, 1, false, false, false, 8);
+    voro::container_3d con(-10, 10, -10, 10, -10, 10, 26, 26, 26, false, false, false, 8);
+
 
     for (int i = 0; i < state.range(0); i++) {
         RandomPoint p(genNumber<-10, 10>);
@@ -40,7 +39,7 @@ static void vorocell_computation(benchmark::State &state) {
     }
 
 
-    voro::voronoicell c;
+    voro::voronoicell_3d c;
 
 
     for (auto _: state)

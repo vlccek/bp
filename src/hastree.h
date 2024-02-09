@@ -82,7 +82,7 @@ public:
 
     bool isPointInBox(std::vector<double> &v, Box &b);
 
-    bool isCellInBox(voro::voronoicell &vc, Box &box);
+    bool isCellInBox(voro::voronoicell_3d &vc, Box &box);
 
     void initTree();
 

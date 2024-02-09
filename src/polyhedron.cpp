@@ -7,7 +7,7 @@
 #include <queue>
 #include "voro++.hh"
 
-Polyhedron::Polyhedron(voro::voronoicell
+Polyhedron::Polyhedron(voro::voronoicell_3d
                        &vc,
                        Point &p
 ) :

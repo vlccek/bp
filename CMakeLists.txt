@@ -8,8 +8,9 @@ option(MERLIN "static link all libs" OFF) # use static linking for glbc/c++ beca
 include_directories(src)
 
 # add voro lib
+add_definitions(-w)
 add_subdirectory(deps/voro)
-include_directories(deps/voro)
+include_directories(deps/voro/src)
 
 add_subdirectory(playground)
 
@@ -30,6 +31,13 @@ if (MERLIN)
     set(CMAKE_CXX_FLAGS " -static -static-libgcc -static-libstdc++ -std=c++20")
 endif ()
 
+
+find_package(OpenMP)
+if (OPENMP_FOUND)
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+endif()
 
 # add_compile_options(-fsanitize=address)
 # add_link_options(-fsanitize=address)
