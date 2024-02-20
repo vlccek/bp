@@ -15,6 +15,9 @@ inline void PrintTo(const Point &p, ::std::ostream *os) {
     *os << std::format("({},{},{})", p.x, p.y, p.z);
 }
 
+constexpr int from = 0;
+constexpr int to = 100;
+
 
 class TestNNalgorithm :
         public testing::TestWithParam<int> {
@@ -46,8 +49,6 @@ Point findNearest(Point &p, std::vector<Point> &points) {
  */
 TEST_P(TestNNalgorithm, TestIfNNNotreturnNotFound) {
 
-    constexpr int from = 0;
-    constexpr int to = 1;
 
     auto p = genPoints<from, to>(GetParam());
 
@@ -65,9 +66,6 @@ TEST_P(TestNNalgorithm, TestIfNNNotreturnNotFound) {
 
 
 TEST_P(TestNNalgorithm, findMorePointInTreeConstant) {
-
-    constexpr int from = 0;
-    constexpr int to = 1;
 
     auto p = genPoints<from, to>(GetParam());
     p.push_back(Point(0, 0, 0.99));
@@ -99,8 +97,6 @@ TEST_P(TestNNalgorithm, findMorePointInTreeConstant) {
 
 
 TEST_P(TestNNalgorithm, findMorePointInTreeRandom) {
-    constexpr int from = 0;
-    constexpr int to = 1;
 
     auto p = genPoints<from, to>(GetParam());;
     HashOctree tree(p, from, to);
@@ -133,9 +129,6 @@ TEST_P(TestNNalgorithm, findMorePointInTreeRandom) {
 
 
 TEST_P(TestNNalgorithm, backCheckAllInseretedPoint) {
-    constexpr int from = 0;
-    constexpr int to = 1000;
-
     auto p = genPoints<from, to>(GetParam());
 
     HashOctree tree(p, from, to);
@@ -157,8 +150,6 @@ TEST_P(TestNNalgorithm, backCheckAllInseretedPoint) {
 
 
 TEST_P(TestNNalgorithm, basicCheckOneInN) {
-    constexpr int from = 0;
-    constexpr int to = 1;
 
     auto p = genPoints<from, to>(GetParam());
 
@@ -184,8 +175,6 @@ TEST_P(TestNNalgorithm, basicCheckOneInN) {
 
 
 TEST_F(TestNNalgorithm, basicCheckOneIn100) {
-    constexpr int from = 0;
-    constexpr int to = 1;
 
     auto p = genPoints<from, to>(20);
     p.push_back(Point(0.007698186061599179, 0.5297001931410572, 0.03457211046484744));
@@ -215,8 +204,6 @@ class TestNNalgorithmNoParam :
 // Implementation limitation. Not working, infinite recursion
 TEST_F(TestNNalgorithmNoParam, gridTest3x3) {
 
-    constexpr int from = 0;
-    constexpr int to = 1;
     constexpr int grid = 2;
 
     std::vector<Point> p = {
@@ -242,9 +229,6 @@ TEST_F(TestNNalgorithmNoParam, gridTest3x3) {
 
 
 TEST_F(TestNNalgorithmNoParam, gridTest) {
-
-    constexpr int from = 0;
-    constexpr int to = 100;
     constexpr int grid = 2;
 
     std::vector<Point> p;

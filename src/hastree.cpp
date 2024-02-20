@@ -38,7 +38,7 @@ HashOctree::HashOctree(std::vector<Point> &p, const Point &min, const Point &max
     }
 
 
-    saveVoroCellToFile(con);
+    // saveVoroCellToFile(con);
     initTree();
 
     buildTree();
