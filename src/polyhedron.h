@@ -26,13 +26,13 @@ public:
 
     operator std::string const() {
         std::string s = "\n";
-        for (auto i: vertexPoints) {
+        for (auto &i: vertexPoints) {
             s += std::format("\t({:.2f},{:.2f},{:.2f})\n", i.x, i.y, i.z);
         }
         return std::format("Vertex: {}", s);
     }
 
-    Point &futherPoint(Point &d);
+    Point &futherPoint(PointDouble &d);
 };
 
 

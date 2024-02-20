@@ -38,7 +38,7 @@ public:
     std::vector<Polyhedron *> voronoiCells;
     std::array<OctrerNodeBuilder *, 8> childs = {0};
 
-    inline void setBox(Point &min, Point &max) {
+    inline void setBox(PointDouble &min, PointDouble &max) {
         border.min = min;
         border.max = max;
     }

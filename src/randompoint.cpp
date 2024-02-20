@@ -8,7 +8,7 @@
 
 
 
-RandomPoint::RandomPoint(double (*random)()) :
+RandomPoint::RandomPoint(float (*random)()) :
         Point(
                 random(),
                 random(),

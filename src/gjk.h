@@ -14,13 +14,13 @@
 #include <format>
 
 /**
- * Function for computing new point of interest
+ * Function for computing new PointDouble of interest
  * @param b box
  * @param p polyhedron
  * @param d direction of interest
- * @return new point of interest
+ * @return new PointDouble of interest
  */
-Point support(Box &b, Polyhedron *p, Point d);
+PointDouble support(Box &b, Polyhedron *p, PointDouble d);
 
 /**
  * Main function for running intersecting check
@@ -36,7 +36,7 @@ bool gjk(Box &b, Polyhedron *p);
  * @param direction
  * @return
  */
-bool nextSimplex(std::vector<Point> &simplex, Point &direction);
+bool nextSimplex(std::vector<PointDouble> &simplex, PointDouble &direction);
 
 /**
  * Check if tetrahedron express intersection
@@ -44,7 +44,7 @@ bool nextSimplex(std::vector<Point> &simplex, Point &direction);
  * @param direction
  * @return if intersect
  */
-bool tetrahedron(std::vector<Point> &simplex, Point &direction);
+bool tetrahedron(std::vector<PointDouble> &simplex, PointDouble &direction);
 
 /**
  * Check if triangle express intersection
@@ -52,7 +52,7 @@ bool tetrahedron(std::vector<Point> &simplex, Point &direction);
  * @param direction
  * @return if intersect
  */
-bool triangle(std::vector<Point> &simplex, Point &direction);
+bool triangle(std::vector<PointDouble> &simplex, PointDouble &direction);
 
 /**
  * Check if triangle express intersection
@@ -60,7 +60,7 @@ bool triangle(std::vector<Point> &simplex, Point &direction);
  * @param direction
  * @return if intersect
  */
-bool line(std::vector<Point> &simplex, Point &direction);
+bool line(std::vector<PointDouble> &simplex, PointDouble &direction);
 
 
 /**
@@ -69,6 +69,6 @@ bool line(std::vector<Point> &simplex, Point &direction);
  * @param direction
  * @return
  */
-bool sameDirection(const Point &direction, const Point &ao);
+bool sameDirection(const PointDouble &direction, const PointDouble &ao);
 
 #endif //BP_GJK_H

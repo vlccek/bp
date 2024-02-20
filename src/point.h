@@ -1,113 +1,105 @@
+#include <iostream>
+#include <cmath>
+#include <string>
 
 #ifndef BP_POINT_H
 #define BP_POINT_H
 
-#include <compare>
-#include <cmath>
-#include <string>
-#include <format>
-
-class Point {
+template<typename T>
+class PointGeneric {
 public:
-    double x;
-    double y;
-    double z;
+    T x, y, z;
 
-    Point(double x, double y, double z);
+    PointGeneric(T x, T y, T z) : x(x), y(y), z(z) {}
 
-
-    void repr();
-
-
-    auto operator>(const Point &p) const {
-        return (x > p.x && y > p.y && z > p.z);
+    template<typename U>
+    auto operator>(const PointGeneric<U> &p) const -> bool {
+        return (x > p.x) && (y > p.y) && (z > p.z);
     }
 
-    auto operator<(const Point &p) const {
-        return ((x < p.x && y < p.y && z < p.z));
+    template<typename U>
+    auto operator<(const PointGeneric<U> &p) const -> bool {
+        return (x < p.x) && (y < p.y) && (z < p.z);
     }
 
-    auto operator>=(const Point &p) const {
-        return (x >= p.x && y >= p.y && z >= p.z);
+    template<typename U>
+    auto operator>=(const PointGeneric<U> &p) const -> bool {
+        return x >= p.x && y >= p.y && z >= p.z;
     }
 
-    auto operator<=(const Point &p) const {
-        return ((x <= p.x && y <= p.y && z <= p.z));
+    template<typename U>
+    auto operator<=(const PointGeneric<U> &p) const -> bool {
+        return x <= p.x && y <= p.y && z <= p.z;
     }
 
-    auto operator-(const Point &p) const {
-        return Point{
-                x - p.x,
-                y - p.y,
-                z - p.z
-        };
-
+    template<typename U>
+    auto operator-(const PointGeneric<U> &p) const -> PointGeneric<T> {
+        return PointGeneric<T>(x - p.x, y - p.y, z - p.z);
     }
 
-    auto operator+(const Point &p) const {
-        return Point{
-                x + p.x,
-                y + p.y,
-                z + p.z
-        };
-
+    template<typename U>
+    auto operator+(const PointGeneric<U> &p) const -> PointGeneric<T> {
+        return PointGeneric<T>(x + p.x, y + p.y, z + p.z);
     }
 
-    auto operator/(const double &p) const {
-        return Point{
-                x / p,
-                y / p,
-                z / p
-        };
+    auto operator/(const int &p) const -> PointGeneric<T> {
+        return PointGeneric<T>(x / p, y / p, z / p);
     }
 
-    auto operator*(const long &p) const {
-        return Point{
-                x * p,
-                y * p,
-                z * p
-        };
+    template<typename U>
+    auto operator/(const PointGeneric<U> &p) const -> PointGeneric<T> {
+        return PointGeneric<T>(x / p.x, y / p.y, z / p.z);
+    }
+
+    auto operator*(const T &p) const -> PointGeneric<T> {
+        return PointGeneric<T>(x * p, y * p, z * p);
+    }
+
+    auto operator*(const PointGeneric<T> &p) const -> T {
+        return x * p.x + y * p.y + z * p.z;
+    }
+
+    auto operator==(const PointGeneric<T> &p) const -> bool {
+        return (x == p.x) && (y == p.y) && (z == p.z);
+    }
+
+
+    template<class U>
+    auto operator*(const PointGeneric<U> &p) const -> PointGeneric<T> {
+        return PointGeneric<T>(y * p.z - z * p.y, z * p.x - x * p.z, x * p.y - y * p.x);
+    }
+
+    auto operator-(const PointGeneric<T> &p) const -> PointGeneric<T> {
+        return PointGeneric<T>(x - p.x, y - p.y, z - p.z);
+    }
+
+    explicit operator PointGeneric<float>() const {
+        PointGeneric<double>(x, y, z);
+    }
+
+
+    auto operator-() const -> PointGeneric<T> {
+        return PointGeneric<T>(-x, -y, -z);
+    }
+
+    template<typename U>
+    auto distance(PointGeneric<U> p) const -> U {
+        return std::sqrt((x - p.x) * (x - p.x) + (y - p.y) * (y - p.y) + (z - p.z) * (z - p.z));
     }
 
     operator std::string() const {
-        return std::format("({:2f},{:2f},{:2f})", x, y, z);
+        return "(" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + ")";
     }
 
-    auto operator<<(std::ostream &os) const {
-        os << std::format("({:2f},{:2f},{:2f})", x, y, z);
+    void repr() const {
+        std::cout << "(" << x << ", " << y << ", " << z << ")" << std::endl;
     }
 
-/**
- * dot
- * @param p
- * @return dot
- */
-    auto operator*(const Point &p) const {
-        return (x * p.x) +
-               (y * p.y) +
-               (z * p.z);
-    }
-
-    auto operator-() const {
-        return Point{
-                -x,
-                -y,
-                -z
-        };
-    }
-
-
-    double distance(Point p) const;
-
-
-    auto operator==(const Point &p) const {
-        return ((x == p.x && y == p.y && z == p.z));
-    }
 
 };
 
-
-inline Point cross(const Point &p1, const Point &p2) {
+template<typename T, typename U>
+inline T cross(const T &p1, const U &p2) {
     return {
             (p1.y * p2.z) - (p1.z * p2.y),
             (p1.z * p2.x) - (p1.x * p2.z),
@@ -116,4 +108,6 @@ inline Point cross(const Point &p1, const Point &p2) {
 }
 
 
+using Point = PointGeneric<float>;
+using PointDouble = PointGeneric<float>;
 #endif

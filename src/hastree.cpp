@@ -4,16 +4,16 @@
 
 #include "hastree.h"
 #include <omp.h>
+#include <chrono>
 
-HashOctree::HashOctree(std::vector<Point> &p, const Point &min,
-                       const Point &max) : min(min), max(max) {
+HashOctree::HashOctree(std::vector<Point> &p, const Point &min, const Point &max)
+        : min(min), max(max) {
     voro::container_3d con(min.x, max.x, min.y, max.y, min.z, max.z, 16, 16, 16, false, false, false, 4);
     voro::particle_order po;
     pointCount = (p.size());
 
-
     int id = 0;
-    for (auto i: p) {
+    for (auto &i: p) {
         con.put(po, id++, i.x, i.y, i.z);
     }
 
@@ -37,6 +37,8 @@ HashOctree::HashOctree(std::vector<Point> &p, const Point &min,
         voronoiCells.insert(voronoiCells.end(), v.begin(), v.end());
     }
 
+
+    saveVoroCellToFile(con);
     initTree();
 
     buildTree();
@@ -45,8 +47,8 @@ HashOctree::HashOctree(std::vector<Point> &p, const Point &min,
 }
 
 
-HashOctree::HashOctree(std::vector<Point> &p, const double min, const double max) : HashOctree(p, Point(min, min, min),
-                                                                                               Point(max, max, max)) {
+HashOctree::HashOctree(std::vector<Point> &p, const float min, const float max) : HashOctree(p, Point(min, min, min),
+                                                                                             Point(max, max, max)) {
 //empty
 }
 
@@ -63,19 +65,19 @@ void HashOctree::buildTree() {
 }
 
 void HashOctree::buildHashTable() {
-    std::set<OctrerNodeBuilder *> allNodes;
+    std::set<OctrerNodeBuilder *> allNodes = {root};
     root->getAllNodes(allNodes);
-
+    std::tuple<int, int, int> p;
     for (auto i: allNodes) {
-        auto p = findBellogingIntervalsByLevel(i->border.center(), i->level);
+        p = findBellogingIntervalsByLevel(i->border.center(), i->level);
         hashTable[std::make_pair(i->level, p)] = i;
     }
 }
 
 
 Point HashOctree::nn(Point &p) {
-#if 0
-    if (pointCount < (8 * 4) + 1) { // todo add connection to max number of points in node
+#if 1
+    if (maxLevel < 2) { // todo add connection to max number of points in node
         return findClosesPointInNode(p, root);
     }
 #endif
@@ -117,7 +119,7 @@ Point HashOctree::nn(Point &p) {
 }
 
 Point HashOctree::findClosesPointInNode(Point &p, const OctrerNodeBuilder *node) {
-    double smallestDistance = std::numeric_limits<double>::max();
+    float smallestDistance = std::numeric_limits<float>::max();
     Point *closesPoint;
     for (auto &i: node->voronoiCells) {
         auto distance = i->p.distance(p);
@@ -164,6 +166,17 @@ std::set<OctrerNodeBuilder *> HashOctree::getAllNodes() {
     root->getAllNodes(allNodes);
 
     return allNodes;
+}
+
+void HashOctree::saveVoroCellToFile(voro::container_3d &con) {
+    // Output the particle positions in gnuplot format
+    con.draw_particles("random_points_p.gnu");
+
+    // Output the Voronoi cells in gnuplot format
+    con.draw_cells_gnuplot("random_points_v.gnu");
+
+    //splot 'random_points_p.gnu' u 2:3:4 with points, 'random_points_v.gnu' with lines
+
 }
 
 

@@ -22,10 +22,8 @@ class TestNNalgorithm :
 
 INSTANTIATE_TEST_SUITE_P(numberOfPoints,
                          TestNNalgorithm,
-                         ::testing::Values(20, 100, 1000, 10000
-                                 ,100000
-                                 // ,1000000
-                                 //, 10000000, 100000000
+                         ::testing::Values(20, 100, 1000, 10000, 100000, 1000000, 10000000,
+                                           100000000
                          )
 );
 
@@ -64,7 +62,6 @@ TEST_P(TestNNalgorithm, TestIfNNNotreturnNotFound) {
     // tree.printHashTable();
 
 }
-
 
 
 TEST_P(TestNNalgorithm, findMorePointInTreeConstant) {
@@ -116,7 +113,7 @@ TEST_P(TestNNalgorithm, findMorePointInTreeRandom) {
 
     std::vector<Point> corespondingclosespoint;
     for (auto i: testedPoint)
-        corespondingclosespoint.push_back(HashOctree::findClosesPointInNode(i, tree.getRoot()));
+        corespondingclosespoint.push_back(tree.findClosesPointInNode(i, tree.getRoot()));
 
     for (int i = 0; i < 3; i++) {
         auto findedpoint = tree.nn(testedPoint[i]);
@@ -135,11 +132,9 @@ TEST_P(TestNNalgorithm, findMorePointInTreeRandom) {
 }
 
 
-
-
 TEST_P(TestNNalgorithm, backCheckAllInseretedPoint) {
     constexpr int from = 0;
-    constexpr int to = 1;
+    constexpr int to = 1000;
 
     auto p = genPoints<from, to>(GetParam());
 
@@ -172,7 +167,6 @@ TEST_P(TestNNalgorithm, basicCheckOneInN) {
     Point i = Point(0.8885722140672627, 0.7254119986607919, 0.6295434181240079);
 
     Point nearest = findNearest(i, p);
-    auto tmp = tree.findBellogingIntervals(i, 3 * 2);
     auto findedpoint = tree.nn(i);
     if (findedpoint != nearest)
         std::cout << std::format(
@@ -194,13 +188,12 @@ TEST_F(TestNNalgorithm, basicCheckOneIn100) {
     constexpr int to = 1;
 
     auto p = genPoints<from, to>(20);
-    p.push_back(Point(0.007698186061599179,0.5297001931410572,0.03457211046484744));
+    p.push_back(Point(0.007698186061599179, 0.5297001931410572, 0.03457211046484744));
 
     HashOctree tree(p, from, to);
 
     // tree.printHashTable();
-    Point i = Point(0.007698186061599179,0.5297001931410572,0.03457211046484744);
-    auto tmp = tree.findBellogingIntervals(i, 3 * 2);
+    Point i = Point(0.007698186061599179, 0.5297001931410572, 0.03457211046484744);
     auto findedpoint = tree.nn(i);
     if (findedpoint != i)
         std::cout << std::format(
@@ -212,12 +205,46 @@ TEST_F(TestNNalgorithm, basicCheckOneIn100) {
     EXPECT_EQ(findedpoint, i);
 }
 
+
+
+class TestNNalgorithmNoParam :
+        public testing::Test {
+};
+
+
 // Implementation limitation. Not working, infinite recursion
-#if 0
-TEST_F(TestNNalgorithm, gridTest) {
+TEST_F(TestNNalgorithmNoParam, gridTest3x3) {
 
     constexpr int from = 0;
     constexpr int to = 1;
+    constexpr int grid = 2;
+
+    std::vector<Point> p = {
+            {0.75, 0.75, .75},
+            {.75,  .75,  .25},
+            {.75,  .25,  .75},
+            {.75,  .25,  .25},
+            {.25,  .75,  .75},
+            {.25,  .75,  0.25},
+            {.25,  .25,  .75},
+            {.25,  .25,  .25}
+    };
+    for (auto &i: p) {
+        i = i * to;
+    }
+
+
+    HashOctree tree(p, from, to);
+
+    auto po = Point(0.1, 0.1, 0.1);
+    auto findedPoint = tree.nn(po);
+}
+
+
+TEST_F(TestNNalgorithmNoParam, gridTest) {
+
+    constexpr int from = 0;
+    constexpr int to = 100;
     constexpr int grid = 2;
 
     std::vector<Point> p;
@@ -226,7 +253,7 @@ TEST_F(TestNNalgorithm, gridTest) {
     for (int i = 0; i < grid; i++) {
         for (int l = 0; l < grid; l++) {
             for (int k = 0; k < grid; k++) {
-                p.push_back(Point(i / (double) grid, l / (double) grid, k / (double) grid));
+                p.push_back(Point(i / (double) grid, l / (double) grid, k / (double) grid) * to);
             }
         }
     }
@@ -236,6 +263,4 @@ TEST_F(TestNNalgorithm, gridTest) {
     auto po = Point(0.1, 0.1, 0.1);
     auto findedPoint = tree.nn(po);
 }
-#endif
-
 

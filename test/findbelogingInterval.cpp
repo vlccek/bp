@@ -9,75 +9,82 @@
 #include "randompoint.h"
 #include "hastree.h"
 
+class TestFindBelogingInterval :
+        public testing::TestWithParam<float> {
+};
 
-TEST(findBellogingIntervals, half) {
-    constexpr int from = 0;
-    constexpr int to = 1;
+INSTANTIATE_TEST_SUITE_P(constMultiply,
+                         TestFindBelogingInterval,
+                         ::testing::Values(1, 1.235, 10.358, 125.7, 0.233, 100, -5
+                                 // ,1000000
+                                 //, 10000000, 100000000
+                         )
+);
 
-    auto p = genPoints<from, to>(1);
 
-    HashOctree tree(p, from, to);
+TEST_P(TestFindBelogingInterval, test0ToN) {
+    float param = GetParam();
+    float from = 0 * param;
+    float to = 1 * param;
 
-    auto sp = tree.findBellogingIntervals(Point(0, 0, 0), 2);
-    EXPECT_EQ(sp, std::make_tuple(0, 0, 0));
-    auto sp2 = tree.findBellogingIntervals(Point(1, 1, 1), 2);
-    EXPECT_EQ(sp2, std::make_tuple(1, 1, 1));
-    auto sp3 = tree.findBellogingIntervals(Point(0.5, 0.5, 0.5), 2);
-    EXPECT_EQ(sp3, std::make_tuple(1, 1, 1));
-    auto sp4 = tree.findBellogingIntervals(Point(0.5, 0.5, 0.5), 1);
+    std::vector<Point> p = {Point(0, 0, 0)};
+
+    HashOctree tree(p, from, to); // need to build tree
+
+
+    Point testedPoint{0.1, 1, 0.89};
+    testedPoint = testedPoint * param;
+
+    std::cout << "Tested point: " << testedPoint.operator std::string() << std::endl;
+    EXPECT_EQ(std::make_tuple(0, 0, 0), tree.findBellogingIntervalsByLevel(testedPoint, 0));
+    EXPECT_EQ(std::make_tuple(0, 1, 1), tree.findBellogingIntervalsByLevel(testedPoint, 1));
+    EXPECT_EQ(std::make_tuple(0, 3, 3), tree.findBellogingIntervalsByLevel(testedPoint, 2));
+    EXPECT_EQ(std::make_tuple(0, 7, 7), tree.findBellogingIntervalsByLevel(testedPoint, 3));
+    EXPECT_EQ(std::make_tuple(1, 15, 14), tree.findBellogingIntervalsByLevel(testedPoint, 4));
+    EXPECT_EQ(std::make_tuple(3, 31, 28), tree.findBellogingIntervalsByLevel(testedPoint, 5));
 }
 
-TEST(findBellogingIntervals, quad) {
-    constexpr int from = 0;
-    constexpr int to = 1;
+TEST_P(TestFindBelogingInterval, testNToN) {
+    float param = GetParam();
+    float from = 1 * param;
+    float to = 2 * param;
 
-    auto p = genPoints<from, to>(1);
+    std::vector<Point> p = {Point(from, from, from)};
 
-    HashOctree tree(p, from, to);
+    HashOctree tree(p, from, to); // need to build tree
 
-    auto sp = tree.findBellogingIntervals(Point(0, 0, 0), 4);
-    EXPECT_EQ(sp, std::make_tuple(0, 0, 0));
-    auto sp2 = tree.findBellogingIntervals(Point(1, 1, 1), 4);
-    EXPECT_EQ(sp2, std::make_tuple(3,3,3));
-    auto sp3 = tree.findBellogingIntervals(Point(0.5, 0.5, 0.5), 4);
-    EXPECT_EQ(sp3, std::make_tuple(2,2,2));
-    auto sp4 = tree.findBellogingIntervals(Point(0.25, 0.25, 0.25), 4);
-    EXPECT_EQ(sp4, std::make_tuple(1,1,1));
-    auto sp5 = tree.findBellogingIntervals(Point(0.75, 0.75, 0.75), 4);
-    EXPECT_EQ(sp5, std::make_tuple(3,3,3));
+
+    Point testedPoint{1.1, 2, 1.89};
+    testedPoint = testedPoint * param;
+
+    std::cout << "Tested point: " << testedPoint.operator std::string() << std::endl;
+    EXPECT_EQ(std::make_tuple(0, 0, 0), tree.findBellogingIntervalsByLevel(testedPoint, 0));
+    EXPECT_EQ(std::make_tuple(0, 1, 1), tree.findBellogingIntervalsByLevel(testedPoint, 1));
+    EXPECT_EQ(std::make_tuple(0, 3, 3), tree.findBellogingIntervalsByLevel(testedPoint, 2));
+    EXPECT_EQ(std::make_tuple(0, 7, 7), tree.findBellogingIntervalsByLevel(testedPoint, 3));
+    EXPECT_EQ(std::make_tuple(1, 15, 14), tree.findBellogingIntervalsByLevel(testedPoint, 4));
+    EXPECT_EQ(std::make_tuple(3, 31, 28), tree.findBellogingIntervalsByLevel(testedPoint, 5));
 }
 
-TEST(findBellogingIntervals, oct) {
-    constexpr int from = 0;
-    constexpr int to = 1;
 
-    auto p = genPoints<from, to>(1);
+TEST_P(TestFindBelogingInterval, testMinusNToN) {
+    float param = GetParam();
+    float from = -1 * param;
+    float to = 0 * param;
 
-    HashOctree tree(p, from, to);
+    std::vector<Point> p = {Point(from, from, from)};
 
-    auto sp = tree.findBellogingIntervals(Point(0, 0, 0), 8);
-    EXPECT_EQ(sp, std::make_tuple(0, 0, 0));
-    auto sp2 = tree.findBellogingIntervals(Point(1, 1, 1), 8);
-    EXPECT_EQ(sp2, std::make_tuple(7,7,7));
-    auto sp3 = tree.findBellogingIntervals(Point(0.5, 0.5, 0.5), 8);
-    EXPECT_EQ(sp3, std::make_tuple(4,4,4));
-    auto sp4 = tree.findBellogingIntervals(Point(0.25, 0.25, 0.25), 8);
-    EXPECT_EQ(sp4, std::make_tuple(2,2,2));
-    auto sp5 = tree.findBellogingIntervals(Point(0.75, 0.75, 0.75), 8);
-    EXPECT_EQ(sp5, std::make_tuple(6,6,6));
-}
+    HashOctree tree(p, from, to); // need to build tree
 
-TEST(findBellogingIntervalsByLevel, one) {
-    constexpr int from = 0;
-    constexpr int to = 1;
 
-    auto p = genPoints<from, to>(1);
+    Point testedPoint{-1+0.1, -1+0.99999, -1+0.89}; // tested point
+    testedPoint = testedPoint * param;
 
-    HashOctree tree(p, from, to);
-
-    auto sp = tree.findBellogingIntervals(Point(0, 0, 0), 1);
-    EXPECT_EQ(sp, std::make_tuple(0, 0, 0));
-    auto sp2 = tree.findBellogingIntervals(Point(1, 1, 1), 1);
-    EXPECT_EQ(sp2, std::make_tuple(1, 1, 1));
-
+    std::cout << "Tested point: " << testedPoint.operator std::string() << std::endl;
+    EXPECT_EQ(std::make_tuple(0, 0, 0), tree.findBellogingIntervalsByLevel(testedPoint, 0));
+    EXPECT_EQ(std::make_tuple(0, 1, 1), tree.findBellogingIntervalsByLevel(testedPoint, 1));
+    EXPECT_EQ(std::make_tuple(0, 3, 3), tree.findBellogingIntervalsByLevel(testedPoint, 2));
+    EXPECT_EQ(std::make_tuple(0, 7, 7), tree.findBellogingIntervalsByLevel(testedPoint, 3));
+    EXPECT_EQ(std::make_tuple(1, 15, 14), tree.findBellogingIntervalsByLevel(testedPoint, 4));
+    EXPECT_EQ(std::make_tuple(3, 31, 28), tree.findBellogingIntervalsByLevel(testedPoint, 5));
 }

@@ -8,6 +8,9 @@
 #include <vector>
 #include <array>
 #include <tuple>
+#include <format>
+#include <iostream>
+#include <fstream>
 #include "voro++.hh"
 
 #include "point.h"
@@ -24,8 +27,8 @@ public:
 
     inline std::array<Point, 8> allVertex() {
         std::array<Point, 8> a = {
-                min,
-                {min.x, max.y, min.z},
+                min, // 0,0,0
+                {min.x, max.y, min.z},// 0,1,0
                 {min.x, max.y, max.z},
                 {min.x, min.y, max.z},
                 max,
@@ -36,14 +39,20 @@ public:
         return a;
     }
 
+    void writeGnuFormat(std::string &filename);
+
+    void writeGnuFormat() {
+        std::string filename = "border.gnu";
+        writeGnuFormat(filename);
+    };
 
     std::vector<Box> splitBoxBy8();
 
 
-    Box(double xa, double ya, double za, double xb, double yb, double zb);
+    Box(float xa, float ya, float za, float xb, float yb, float zb);
 
     inline bool isInside(Point point) const {
-        if (point >= min && point <= max) {
+        if (point > min && point < max) {
             return true;
         }
         return false;
@@ -57,12 +66,26 @@ public:
         return false;
     }
 
+    /**
+     * Check if the box is inside another box
+     * @param b
+     * @return
+     */
     inline bool isInside(Box &b) const {
         auto vertex_of_box = b.allVertex();
         return isInside(vertex_of_box);
     }
 
-    bool isInside(const std::vector<Point> *vertex);
+    template<typename T>
+    bool isInside(const std::vector<T> *vertex) const {
+        for (auto p: *vertex) {
+            if (isInside(p))
+                return true;
+        }
+        return false;
+
+    }
+
 
     inline Point center() const {
         Point edge = max - min;
@@ -72,10 +95,10 @@ public:
     auto operator==(const Box &b) const {
         return (min == b.min && max == b.max);
     }
-    explicit operator std::string () const {
+
+    explicit operator std::string() const {
         return std::format("{} {} {} x {} {} {} ", min.x, min.y, min.z, max.x, max.y, max.z);
     }
-
 
 
     inline bool intersectionWithBox(Box &b) {
@@ -91,6 +114,12 @@ public:
     inline Point &futherPoint(Point &d) {
         return min;
     }
+
+    inline bool isTooSmall() const {
+        return (max - min).x < std::numeric_limits<float>::epsilon() ||
+               (max - min).y < std::numeric_limits<float>::epsilon() ||
+               (max - min).z < std::numeric_limits<float>::epsilon();
+    }
 };
 
 
@@ -98,12 +127,12 @@ std::vector<Box> splitboxby8(const Point &minP, const Point &maxP);
 
 class BoudingBox : public Box {
 
-    public:
-        BoudingBox() : Box({0, 0, 0}, {0, 0, 0}) {};
+public:
+    BoudingBox() : Box({0, 0, 0}, {0, 0, 0}) {};
 
-        explicit BoudingBox(std::vector<double> &d);
+    explicit BoudingBox(std::vector<float> &d);
 
-        explicit BoudingBox(std::vector<Point> &vertex);
-    };
+    explicit BoudingBox(std::vector<Point> &vertex);
+};
 
 #endif //BP_BOX_H

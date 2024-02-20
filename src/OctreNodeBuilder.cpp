@@ -20,10 +20,12 @@ void OctrerNodeBuilder::addVoroCell(Polyhedron *vc) {
 }
 
 void OctrerNodeBuilder::buildTree() {
-    if (level > 1000 && (border.min - border.max < Point{0.00001, 0.00001, 0.00001})) {
+    if (border.isTooSmall()) {
         std::cout << "Unable to build tree becouse the region is too small" << std::endl;
-// todo remove this
-        return;
+
+        border.writeGnuFormat();
+        // todo remove this
+        exit(10);
     }
     std::vector<Box> splitedBox = border.splitBoxBy8();
     int l;
@@ -108,9 +110,6 @@ void OctrerNodeBuilder::getLeafs(std::vector<OctrerNodeBuilder *> &leafs) {
 }
 
 
-
-
-
 OctrerNodeBuilder::~OctrerNodeBuilder() {
     for (auto &child: childs) {
         if (child != nullptr) {
@@ -123,7 +122,7 @@ OctrerNodeBuilder::~OctrerNodeBuilder() {
 void OctrerNodeBuilder::printVoronoiCells(std::ofstream &file) {
     for (auto &vc: voronoiCells) {
         // file << vc->p.operator std::string() << std::endl;
-        for (auto &p : vc->vertexPoints) {
+        for (auto &p: vc->vertexPoints) {
             file << p.operator std::string() << std::endl;
         }
         file << std::endl;  // empty line

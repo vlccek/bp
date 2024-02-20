@@ -52,7 +52,7 @@ add_library(hashoctree
         src/OctrerNodeBuilder.h
         src/box.cpp
         src/polyhedron.cpp
-        src/gjk.cpp
+        # src/gjk.cpp
 )
 
 target_link_libraries(hashoctree voro++)

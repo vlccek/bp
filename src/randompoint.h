@@ -13,15 +13,15 @@
  */
 class RandomPoint : public Point {
 public:
-    explicit RandomPoint(double (*random)());
+    explicit RandomPoint(float (*random)());
 };
 
 template<int FROM, int TO>
-static double genNumber() {
+static float genNumber() {
     static std::default_random_engine e1(1);
-    static std::uniform_real_distribution<double> uniform_dist(FROM, TO);
+    static std::uniform_real_distribution<float> uniform_dist(FROM, TO);
 
-    return (double) uniform_dist(e1);
+    return static_cast<float>( uniform_dist(e1));
 }
 
 template<int FROM, int TO>

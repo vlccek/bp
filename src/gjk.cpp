@@ -4,10 +4,10 @@
 
 
 bool gjk(Box &b, Polyhedron *p) {
-    Point direction = b.center() - p->p; // compute the base direction as difference of centers of box and polyhedron
+    PointDouble direction = b.center() - p->p; // compute the base direction as difference of centers of box and polyhedron
 
-    std::vector<Point> simplex;
-    Point a = support(b, p, direction);
+    std::vector<PointDouble> simplex;
+    PointDouble a = support(b, p, direction);
     simplex.insert(simplex.begin(), a);
     direction = -a;
 
@@ -136,7 +136,7 @@ bool nextSimplex(std::vector<Point> &simplex, Point &direction) {
     return false;
 }
 
-Point support(Box &b, Polyhedron *p, Point d) {
+PointDouble support(Box &b, Polyhedron *p, PointDouble d) {
     auto minusd = -d;
     return b.futherPoint(d) - p->futherPoint(minusd);
 }
