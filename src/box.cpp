@@ -16,26 +16,32 @@ Box::Box(Point min, Point max)
     // empty :)
 }
 
-Box::Box(double xa, double ya, double za, double xb, double yb, double zb)
+Box::Box(float xa, float ya, float za, float xb, float yb, float zb)
         : min(xa, ya, za), max(xb, yb, zb) {
     // empty :)
 }
 
-bool Box::isInside(const std::vector<Point> *vertex) {
-    for (auto p: *vertex) {
-        if (isInside(p))
-            return true;
-    }
-    return false;
-
-}
 
 std::vector<Box> Box::splitBoxBy8() {
     return splitboxby8(min, max);
 }
 
+void Box::writeGnuFormat(std::string &filename) {
+    std::ofstream file;
+    file.open(filename);
+    int id = 0;
+    auto allVertex = this->allVertex();
+    for (auto l: {0,1,2,3,0,7,5,3,5,4,6,7,5,4,2,1,6}) {
+        auto i = allVertex[l];
+        file << std::format("{} {} {}", i.x, i.y, i.z) << std::endl;
+    }
 
-BoudingBox::BoudingBox(std::vector<double> &d) : Box({0, 0, 0}, {0, 0, 0}) {
+    file.close();
+
+}
+
+
+BoudingBox::BoudingBox(std::vector<float> &d) : Box({0, 0, 0}, {0, 0, 0}) {
     for (int i = 0; i < d.size(); ++i) {
         if (min.x > d[i]) {
             min.x = d[i];
@@ -60,8 +66,8 @@ BoudingBox::BoudingBox(std::vector<double> &d) : Box({0, 0, 0}, {0, 0, 0}) {
 }
 
 BoudingBox::BoudingBox(std::vector<Point> &vertex) : Box(
-        {std::numeric_limits<double>::min(), std::numeric_limits<double>::min(), std::numeric_limits<double>::min()},
-        {std::numeric_limits<double>::max(), std::numeric_limits<double>::max(), std::numeric_limits<double>::max()}) {
+        {std::numeric_limits<float>::min(), std::numeric_limits<float>::min(), std::numeric_limits<float>::min()},
+        {std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max()}) {
     for (auto i: vertex) {
         if (min.x > i.x) {
             min.x = i.x;
@@ -94,9 +100,9 @@ std::vector<Box> splitboxby8(const Point &minP, const Point &maxP) {
     const Point min = minP;
     const Point max = maxP;
     // Rozdělení podle středu každé strany
-    double midX = (min.x + max.x) / 2.0;
-    double midY = (min.y + max.y) / 2.0;
-    double midZ = (min.z + max.z) / 2.0;
+    float midX = (min.x + max.x) / 2.0;
+    float midY = (min.y + max.y) / 2.0;
+    float midZ = (min.z + max.z) / 2.0;
 
     // Vytvoření osmi podboxů
     result.push_back(Box(min, Point(midX, midY, midZ)));                    // Levý spodní přední
