@@ -7,13 +7,13 @@
 #include <queue>
 #include "voro++.hh"
 
-Polyhedron::Polyhedron(voro::voronoicell_3d
+Polyhedron::Polyhedron(voro::voronoicell_neighbor_3d
                        &vc,
-                       Point  &p
+                       Point &p
 ) :
         p(p) {
     std::vector<double> vertex;
-    vc.vertices(p.x,p.y,p.z,vertex);
+    vc.vertices(p.x, p.y, p.z, vertex);
     for (int i = 0; i < vertex.size(); i += 3) {
         Point p(vertex[i], vertex[i + 1], vertex[i + 2]);
         vertexPoints.push_back(p);
@@ -21,7 +21,7 @@ Polyhedron::Polyhedron(voro::voronoicell_3d
     boudingBox = BoudingBox(vertexPoints);
 }
 
-Point  &Polyhedron::futherPoint(PointDouble  &d) {
+Point &Polyhedron::futherPoint(PointDouble &d) {
 
     std::pair<Point *, double> max{&vertexPoints[0], 0}; // saving point and his destination
     for (int i = 0; i < vertexPoints.size(); i++) {
@@ -34,10 +34,13 @@ Point  &Polyhedron::futherPoint(PointDouble  &d) {
     return *max.first;
 }
 
-Polyhedron::Polyhedron(std::vector<Point > &vertext, Point  &centerPoint): p(centerPoint) {
+
+Polyhedron::Polyhedron(std::vector<Point> &vertext, Point &centerPoint, voro::voronoicell_neighbor_3d &cell) : p(
+        centerPoint) {
 
     for (auto &i: vertext) {
         vertexPoints.push_back(i);
     }
     boudingBox = BoudingBox(vertexPoints);
+
 }

@@ -3,12 +3,10 @@
 //
 
 #include "hastree.h"
-#include <omp.h>
-#include <chrono>
 
 HashOctree::HashOctree(std::vector<Point> &p, const Point &min, const Point &max)
         : min(min), max(max) {
-    voro::container_3d con(min.x, max.x, min.y, max.y, min.z, max.z, 16, 16, 16, false, false, false, 4);
+    voro::container_3d con(min.x, max.x, min.y, max.y, min.z, max.z, 160, 160, 160, false, false, false, 8, 24);
     voro::particle_order po;
     pointCount = (p.size());
 
@@ -17,33 +15,59 @@ HashOctree::HashOctree(std::vector<Point> &p, const Point &min, const Point &max
         con.put(po, id++, i.x, i.y, i.z);
     }
 
+    voronoiCells.reserve(pointCount);
 
-    voro::container_3d::iterator_order cio(po, con.nxyz);
+    voro::container_3d::iterator_order cli;
 
+    start = chrono::high_resolution_clock::now();
 
+#pragma omp parallel num_threads(24)
     {
         std::vector<Polyhedron> v;
-        voro::voronoicell_3d c;
+        voro::voronoicell_neighbor_3d c(con);
         double x, y, z;
-        for (cio = con.begin(po); cio < con.end(po); cio++) {
-            if (con.compute_cell(c, cio)) {
-                con.pos(cio, x, y, z);
+#pragma omp for
+        for (cli = con.begin(po); cli < con.end(po); cli++) {
+            if (con.compute_cell(c, cli)) {
+                con.pos(cli, x, y, z);
                 Point po(x, y, z);
                 auto poly = Polyhedron(c, po);
-                voronoiCells.push_back(poly);
+
+                std::vector<int> neighbors;
+                c.neighbors(neighbors);
+                poly.setNeigbors(neighbors);
+
+                v.push_back(poly);
 
             }
         }
-        voronoiCells.insert(voronoiCells.end(), v.begin(), v.end());
+#pragma omp critical
+        {
+            voronoiCells.insert(voronoiCells.end(), v.begin(), v.end());
+        }
     }
 
+
+    voroBuild = chrono::high_resolution_clock::now();
+    auto duration = duration_cast<chrono::milliseconds>(voroBuild - start);
+    cout << "Voronoi finish: " << duration.count() << "ms" << endl;
 
     // saveVoroCellToFile(con);
     initTree();
 
     buildTree();
 
+    treeBuild = chrono::high_resolution_clock::now();
+    duration = duration_cast<chrono::milliseconds>(treeBuild - voroBuild);
+    cout << "tree finish: " << duration.count() << "ms" << endl;
+
+
     buildHashTable();
+
+
+    htBuild = chrono::high_resolution_clock::now();
+    duration = duration_cast<chrono::milliseconds >(htBuild - treeBuild);
+    cout << "HT finish: " << duration.count() << "ms" << endl;
 }
 
 
@@ -67,11 +91,37 @@ void HashOctree::buildTree() {
 void HashOctree::buildHashTable() {
     std::set<OctrerNodeBuilder *> allNodes = {root};
     root->getAllNodes(allNodes);
-    std::tuple<int, int, int> p;
-    for (auto i: allNodes) {
-        p = findBellogingIntervalsByLevel(i->border.center(), i->level);
-        hashTable[std::make_pair(i->level, p)] = i;
+    hashTable.rehash(allNodes.size());
+
+    std::vector<OctrerNodeBuilder *> nodes(allNodes.begin(), allNodes.end());
+#pragma omp parallel shared(hashTable, nodes)
+    {
+        std::tuple<int, int, int> p;
+
+        std::unordered_map<std::pair<int, std::tuple<int, int, int>>, OctrerNodeBuilder *> hashTableThread;
+        hashTableThread.reserve(allNodes.size());
+
+#pragma omp for
+        for (auto i: nodes) {
+            p = findBellogingIntervalsByLevel(i->border.center(), i->level);
+            auto pair = std::make_pair(i->level, p);
+
+            // hashTable[std::make_pair(i->level, p)] = i;
+            hashTableThread.emplace(pair, i);
+        }
+#pragma omp critical
+        {
+            fujtable(hashTableThread);
+        }
     }
+
+}
+
+void
+HashOctree::fujtable(
+        unordered_map<std::pair<int, std::tuple<int, int, int>>, OctrerNodeBuilder *> &hashTableThread) {
+    // hashTable.merge(hashTableThread);
+    hashTable.insert(hashTableThread.begin(), hashTableThread.end());
 }
 
 
@@ -109,9 +159,9 @@ Point HashOctree::nn(Point &p) {
 #if 0
     if (iterator == hashTable.end()) {
 
-            std::cerr << std::format("not found: ({},{},{})", p.x, p.y, p.z) << std::endl;
-            return {0, 0, 0};
-        }
+        std::cerr << std::format("not found: ({},{},{})", p.x, p.y, p.z) << std::endl;
+        return {0, 0, 0};
+    }
 #endif
 
     // printNodePoints(iterator->second);

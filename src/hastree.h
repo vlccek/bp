@@ -22,6 +22,8 @@
 #include "voro++.hh"
 #include "OctrerNodeBuilder.h"
 #include "polyhedron.h"
+#include <omp.h>
+#include <chrono>
 // #include "gjk.h"
 
 template<>
@@ -31,21 +33,24 @@ struct std::hash<std::pair<int, std::tuple<int, int, int>>> {
         using std::hash;
         using std::string;
 
-        // Compute individual hash values for first,
-        // second and third and combine them using XOR
-        // and bit shifting:
+        auto hash1 = std::hash<int>{}(k.first);
+        auto hash2 = std::hash<int>{}(std::get<0>(k.second));
+        auto hash3 = std::hash<int>{}(std::get<1>(k.second));
+        auto hash4 = std::hash<int>{}(std::get<2>(k.second));
 
-        return (
-                (hash<int>()(k.first)
-                 ^ (hash<int>()(std::get<0>(k.second) << 1) >> 1)
-                 ^ (hash<int>()(std::get<1>(k.second) << 1) >> 1)
-                 ^ (hash<int>()(std::get<2>(k.second) << 1) >> 1)
-                ));
+        // Combine the hashes
+        std::size_t seed = 0;
+        seed ^= hash1 + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        seed ^= hash2 + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        seed ^= hash3 + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        seed ^= hash4 + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+
+        return seed;
     }
 };
 
 
-template< typename U, typename V>
+template<typename U, typename V>
 inline PointGeneric<U> normalizePoint(PointGeneric<U> p, PointGeneric<V> min, PointGeneric<V> max) {
     return (p - min) / (max - min);
 }
@@ -56,6 +61,11 @@ class HashOctree {
     std::vector<Polyhedron> voronoiCells;
     int maxLevel = 0;
     int minLeafLevel = 0;
+    chrono::time_point<chrono::high_resolution_clock> start;
+    chrono::time_point<chrono::high_resolution_clock> voroBuild;
+    chrono::time_point<chrono::high_resolution_clock> treeBuild;
+    chrono::time_point<chrono::high_resolution_clock> htBuild;
+
 public:
 
     Point min, max;
@@ -149,6 +159,7 @@ private:
     static void printNodePoints(OctrerNodeBuilder *value);
 
 
+    void fujtable(unordered_map<std::pair<int, std::tuple<int, int, int>>, OctrerNodeBuilder *> &hashTableThread);
 };
 
 

@@ -36,6 +36,7 @@ public:
 
 
     std::vector<Polyhedron *> voronoiCells;
+    std::vector<Polyhedron *> *allVoronoiCells;
     std::array<OctrerNodeBuilder *, 8> childs = {0};
 
     inline void setBox(PointDouble &min, PointDouble &max) {
@@ -47,7 +48,11 @@ public:
 
     void alocateIfNeccesary(int index, Box &b);
 
+
+    bool intersect(Box &b, Polyhedron &vc);
+
     void addVoroCell(Polyhedron *vc);
+    void addAllVoroCell( std::vector<Polyhedron *> *vcVector);
 
     void getLeafs(std::vector<OctrerNodeBuilder *> &leafs);
 

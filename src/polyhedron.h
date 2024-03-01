@@ -18,11 +18,18 @@ public:
     Point p;
     std::vector<Point> vertexPoints; // list of all vertex
     BoudingBox boudingBox;
+    // voro::voronoicell_neighbor_3d cell;
+    std::vector<int> neighbors;// id of neigbors voronoi cells
 
-    Polyhedron(voro::voronoicell_3d &vc, Point &p);
 
-    Polyhedron(std::vector<Point> &vertext, Point &centerPoint);
+    Polyhedron(voro::voronoicell_neighbor_3d &vc, Point &p);
 
+    Polyhedron(std::vector<Point> &vertext, Point &centerPoint, voro::voronoicell_neighbor_3d &cell);
+
+
+    void setNeigbors(std::vector<int> &n) {
+        neighbors = n;
+    }
 
     operator std::string const() {
         std::string s = "\n";

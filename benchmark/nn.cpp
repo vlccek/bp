@@ -11,7 +11,7 @@ static void basicnn(benchmark::State &state) {
             Point(0, 0, .95)
     };
     constexpr int from = 0;
-    constexpr int to = 1;
+    constexpr int to = 100;
 
 
     for (int i = 0; i < state.range(0); i++) {

@@ -27,51 +27,18 @@ void OctrerNodeBuilder::buildTree() {
         // todo remove this
         exit(10);
     }
+
+    std::vector<std::vector<Polyhedron*>> tvojemama;
     std::vector<Box> splitedBox = border.splitBoxBy8();
-    int l;
-    for (l = 0; l < splitedBox.size(); ++l) {
+    for (int l = 0; l < splitedBox.size(); ++l) {
         for (auto &voronoiCell: voronoiCells) {
-            Polyhedron *ph = voronoiCell;
-            Point particle = voronoiCell->p;
-            std::vector<Point> *vp = &voronoiCell->vertexPoints; // vertex point of the voronoi cell
-
-            // center point of voronoi cell
             auto box = splitedBox[l];
-#if 1
-            // is particle in BOX ?
-            if (box.isInside(particle)) {
-                alocateIfNeccesary(l, box);
-                childs[l]->addVoroCell(ph);
-                continue;
-            }
+            Polyhedron *ph = voronoiCell;
 
-
-            // is one of vertex of voronoi cell in box ?
-            if (box.isInside(vp)) {
+            if (intersect(splitedBox[l], *voronoiCell)) {
                 alocateIfNeccesary(l, box);
                 childs[l]->addVoroCell(ph);
-                continue;
             }
-#endif
-#if 1
-            // check by bounding box
-            auto boudingboxVertexs = ph->boudingBox.allVertex();
-            //check if bounding box interferes to the box
-            if (box.isInside(boudingboxVertexs)) {
-                // use gjk algorithm to detect intersection
-#if 1
-                alocateIfNeccesary(l, box);
-                childs[l]->addVoroCell(ph);
-                continue;
-#else
-                if (gjk(box, ph)) {
-                    alocateIfNeccesary(l, box);
-                    childs[l]->addVoroCell(ph);
-                    continue;
-                }
-#endif
-            }
-#endif
 
         }
 
@@ -92,6 +59,7 @@ void OctrerNodeBuilder::alocateIfNeccesary(int index, Box &b) {
         childCount++;
         childs[index] = new OctrerNodeBuilder(level + 1, maxLevel);
         childs[index]->border = b;
+        childs[index]->addAllVoroCell(allVoronoiCells);
     }
 
 }
@@ -130,14 +98,60 @@ void OctrerNodeBuilder::printVoronoiCells(std::ofstream &file) {
 }
 
 void OctrerNodeBuilder::getAllNodes(std::set<OctrerNodeBuilder *> &allNodes) {
-    for (auto child: childs) {
-        if (child == nullptr) {
-            continue;
+
+#pragma omp parallel
+    {
+#pragma omp for
+        for (auto child: childs) {
+            if (child == nullptr) {
+                continue;
+            }
+#pragma omp critical
+            allNodes.insert(child);
+            // todo add comdiotn if in allNodes is already all nodes dont need to iterate through all nodes
+            child->getAllNodes(allNodes);
         }
-        allNodes.insert(child);
-        // todo add comdiotn if in allNodes is already all nodes dont need to iterate through all nodes
-        child->getAllNodes(allNodes);
     }
+
 }
+
+void OctrerNodeBuilder::addAllVoroCell(std::vector<Polyhedron *> *vcVector) {
+    allVoronoiCells = vcVector;
+}
+
+bool OctrerNodeBuilder::intersect(Box &b, Polyhedron &vc) {
+    Polyhedron *ph = &vc;
+    Point particle = vc.p;
+    std::vector<Point> *vp = &vc.vertexPoints; // vertex point of the voronoi cell
+
+    // center point of voronoi cell
+    auto box = b;
+    // is particle in BOX ?
+    if (box.isInside(particle)) {
+        return true;
+    }
+
+
+    // is one of vertex of voronoi cell in box ?
+    if (box.isInside(vp)) {
+        return true;
+    }
+    // check by bounding box
+    auto boudingboxVertexs = ph->boudingBox.allVertex();
+    //check if bounding box interferes to the box
+    if (box.isInside(boudingboxVertexs)) {
+        // use gjk algorithm to detect intersection
+        //if 1 skips gjk algorithm and just return true (if bounding box intersects)
+#if 1
+        return true;
+#else
+        if (gjk(box, ph)) {
+                return true;
+        }
+#endif
+    }
+    return false;
+}
+
 
 
