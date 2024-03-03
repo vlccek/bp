@@ -85,9 +85,12 @@ public:
      * @param max end of the subspace
      * @param mmax number that is use in building tree
      */
-    HashOctree(std::vector<Point> &p, const Point &min, const Point &max);
+    HashOctree(std::vector<Point> &p, const Point &min, const Point &max, int threads = 1);
 
-    HashOctree(std::vector<Point> &p, const float min, const float max);
+    HashOctree(std::vector<Point> &p, const float min, const float max, int  threads = 1) : HashOctree(p, Point(min, min, min),
+                                                                                             Point(max, max, max), threads) {
+        //empty
+    };
 
     ~HashOctree() {
         delete root;
@@ -159,7 +162,6 @@ private:
     static void printNodePoints(OctrerNodeBuilder *value);
 
 
-    void fujtable(unordered_map<std::pair<int, std::tuple<int, int, int>>, OctrerNodeBuilder *> &hashTableThread);
 };
 
 

@@ -4,30 +4,30 @@
 
 #include "hastree.h"
 
-HashOctree::HashOctree(std::vector<Point> &p, const Point &min, const Point &max)
+HashOctree::HashOctree(std::vector<Point> &p, const Point &min, const Point &max, int threads)
         : min(min), max(max) {
-    voro::container_3d con(min.x, max.x, min.y, max.y, min.z, max.z, 160, 160, 160, false, false, false, 8, 24);
-    voro::particle_order po;
+    std::cout << std::format("HashOctree with {}", threads) << std::endl;
+    voro::container_3d con(min.x, max.x, min.y, max.y, min.z, max.z, 160, 160, 160, false, false, false, 8, threads);
     pointCount = (p.size());
 
     int id = 0;
     for (auto &i: p) {
-        con.put(po, id++, i.x, i.y, i.z);
+        con.put( id++, i.x, i.y, i.z);
     }
 
     voronoiCells.reserve(pointCount);
 
-    voro::container_3d::iterator_order cli;
+    voro::container_3d::iterator cli;
 
     start = chrono::high_resolution_clock::now();
 
-#pragma omp parallel num_threads(24)
+#pragma omp parallel
     {
         std::vector<Polyhedron> v;
         voro::voronoicell_neighbor_3d c(con);
         double x, y, z;
 #pragma omp for
-        for (cli = con.begin(po); cli < con.end(po); cli++) {
+        for (cli = con.begin(); cli < con.end(); cli++) {
             if (con.compute_cell(c, cli)) {
                 con.pos(cli, x, y, z);
                 Point po(x, y, z);
@@ -66,15 +66,10 @@ HashOctree::HashOctree(std::vector<Point> &p, const Point &min, const Point &max
 
 
     htBuild = chrono::high_resolution_clock::now();
-    duration = duration_cast<chrono::milliseconds >(htBuild - treeBuild);
+    duration = duration_cast<chrono::milliseconds>(htBuild - treeBuild);
     cout << "HT finish: " << duration.count() << "ms" << endl;
 }
 
-
-HashOctree::HashOctree(std::vector<Point> &p, const float min, const float max) : HashOctree(p, Point(min, min, min),
-                                                                                             Point(max, max, max)) {
-//empty
-}
 
 
 void HashOctree::initTree() {
@@ -94,12 +89,12 @@ void HashOctree::buildHashTable() {
     hashTable.rehash(allNodes.size());
 
     std::vector<OctrerNodeBuilder *> nodes(allNodes.begin(), allNodes.end());
-#pragma omp parallel shared(hashTable, nodes)
+#pragma omp parallel
     {
         std::tuple<int, int, int> p;
 
         std::unordered_map<std::pair<int, std::tuple<int, int, int>>, OctrerNodeBuilder *> hashTableThread;
-        hashTableThread.reserve(allNodes.size());
+        //hashTableThread.reserve(allNodes.size());
 
 #pragma omp for
         for (auto i: nodes) {
@@ -111,17 +106,10 @@ void HashOctree::buildHashTable() {
         }
 #pragma omp critical
         {
-            fujtable(hashTableThread);
+            hashTable.merge(hashTableThread);
         }
     }
 
-}
-
-void
-HashOctree::fujtable(
-        unordered_map<std::pair<int, std::tuple<int, int, int>>, OctrerNodeBuilder *> &hashTableThread) {
-    // hashTable.merge(hashTableThread);
-    hashTable.insert(hashTableThread.begin(), hashTableThread.end());
 }
 
 
