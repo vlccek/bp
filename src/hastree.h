@@ -86,10 +86,23 @@ public:
      * @param max end of the subspace
      * @param mmax number that is use in building tree
      */
-    HashOctree(std::vector<Point> &p, const Point &min, const Point &max, int threads = 1);
+    HashOctree(std::vector<Point> &p, const Point &min, const Point &max) :
+            HashOctree(p, min, max, omp_get_num_threads()) {
+// EMPTY
+    }
 
-    HashOctree(std::vector<Point> &p, const float min, const float max, int  threads = 1) : HashOctree(p, Point(min, min, min),
-                                                                                             Point(max, max, max), threads) {
+    HashOctree(std::vector<Point> &p, const Point &min, const Point &max, int threads);
+
+    HashOctree(std::vector<Point> &p, const float min, const float max, int threads) : HashOctree(p,
+                                                                                                  Point(min, min, min),
+                                                                                                  Point(max, max, max),
+                                                                                                  threads) {
+        //empty
+    };
+
+    HashOctree(std::vector<Point> &p, const float min, const float max) : HashOctree(p, Point(min, min, min),
+                                                                                     Point(max, max, max),
+                                                                                     omp_get_max_threads()) {
         //empty
     };
 

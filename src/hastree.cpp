@@ -7,7 +7,7 @@
 HashOctree::HashOctree(std::vector<Point> &p, const Point &min, const Point &max, int threads)
         : min(min), max(max),
           con(min.x, max.x, min.y, max.y, min.z, max.z, 160, 160, 160, false, false, false, 8, threads) {
-    root = new OctrerNodeBuilder(0, &maxLevel, &con);
+    root = new OctrerNodeBuilder(0, &maxLevel, &con, &voronoiCells);
 
 
     std::cout << std::format("HashOctree with {}", threads) << std::endl;
@@ -34,7 +34,7 @@ HashOctree::HashOctree(std::vector<Point> &p, const Point &min, const Point &max
             if (con.compute_cell(c, cli)) {
                 con.pos(cli, x, y, z);
                 Point po(x, y, z);
-                auto poly = Polyhedron(c, po);
+                auto poly = Polyhedron(c, po, cli.ptr.q);
 
                 std::vector<int> neighbors;
                 c.neighbors(neighbors);
@@ -49,6 +49,10 @@ HashOctree::HashOctree(std::vector<Point> &p, const Point &min, const Point &max
             voronoiCells.insert(voronoiCells.end(), v.begin(), v.end());
         }
     }
+
+    std::sort(voronoiCells.begin(), voronoiCells.end(), [](const Polyhedron &a, const Polyhedron &b) {
+        return a.id < b.id;
+    });
 
 
     voroBuild = chrono::high_resolution_clock::now();
