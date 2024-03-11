@@ -5,7 +5,8 @@
 #include "OctrerNodeBuilder.h"
 
 
-OctrerNodeBuilder::OctrerNodeBuilder(int level, int *maxLevel, voro::container_3d *con) {
+OctrerNodeBuilder::OctrerNodeBuilder(int level, int *maxLevel, voro::container_3d *con,
+                                     std::vector<Polyhedron> *allVoronoiCells) {
     this->maxLevel = maxLevel;
     this->level = level;
 
@@ -13,9 +14,9 @@ OctrerNodeBuilder::OctrerNodeBuilder(int level, int *maxLevel, voro::container_3
         *maxLevel = level;
     }
     voronoiCells = {};
-     con = con;
+    this->con = con;
+    this->allVoronoiCells = allVoronoiCells;
 }
-
 
 
 void OctrerNodeBuilder::buildTree() {
@@ -26,17 +27,47 @@ void OctrerNodeBuilder::buildTree() {
 
     std::vector<Box> splitedBox = border.splitBoxBy8();
     for (int l = 0; l < splitedBox.size(); ++l) {
-        for (auto &voronoiCell: voronoiCells) {
-            auto box = splitedBox[l];
-            Polyhedron *ph = voronoiCell;
 
-            if (intersect(splitedBox[l], *voronoiCell)) {
-                alocateIfNeccesary(l, box);
-                childs[l]->addVoroCell(ph);
+        auto box = splitedBox[l];
+        double x = 0, y = 0, z = 0;
+        int pid;
+        con->find_voronoi_cell(box.min.x, box.min.y, box.min.z, x, y, z, pid);
+
+
+        std::set<int> visitedCells = {pid};
+        std::set<int> toVisit = {};
+        std::set<int> totoVisit = {};
+
+        Polyhedron &first = allVoronoiCells->at(pid);
+        toVisit.insert(first.neighbors.begin(), first.neighbors.end());
+
+        while (!toVisit.empty()) {
+            for (auto &idVc: toVisit) {
+                if (idVc < 0) {
+                    continue;
+                }
+                Polyhedron &voronoiCell = allVoronoiCells->at(idVc);
+                Polyhedron *ph = &voronoiCell;
+
+                if (intersect(splitedBox[l], voronoiCell)) {
+                    alocateIfNeccesary(l, box);
+                    childs[l]->addVoroCell(ph);
+
+                    // add neighbors of neighbor to totoVisit
+                    totoVisit.insert(voronoiCell.neighbors.begin(), voronoiCell.neighbors.end());
+                }
             }
 
-        }
 
+            visitedCells.insert(toVisit.begin(), toVisit.end());
+            toVisit.clear();
+            std::set_difference(totoVisit.begin(), totoVisit.end(), visitedCells.begin(), visitedCells.end(),
+                                std::inserter(toVisit, toVisit.begin())
+            );
+
+            totoVisit.clear();
+
+        }
 
         if (childs[l] != nullptr && childs[l]->voronoiCells.size() >= 5) // todo remove magic constant
         {
@@ -110,7 +141,7 @@ void OctrerNodeBuilder::getAllNodes(std::set<OctrerNodeBuilder *> &allNodes) {
 
 }
 
-void OctrerNodeBuilder::addAllVoroCell(std::vector<Polyhedron *> *vcVector) {
+void OctrerNodeBuilder::addAllVoroCell(std::vector<Polyhedron> *vcVector) {
     allVoronoiCells = vcVector;
 }
 

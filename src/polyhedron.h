@@ -20,9 +20,10 @@ public:
     BoudingBox boudingBox;
     // voro::voronoicell_neighbor_3d cell;
     std::vector<int> neighbors;// id of neigbors voronoi cells
+    int id;
 
 
-    Polyhedron(voro::voronoicell_neighbor_3d &vc, Point &p);
+    Polyhedron(voro::voronoicell_neighbor_3d &vc, Point &p, int id);
 
     Polyhedron(std::vector<Point> &vertext, Point &centerPoint, voro::voronoicell_neighbor_3d &cell);
 

@@ -9,7 +9,8 @@
 
 Polyhedron::Polyhedron(voro::voronoicell_neighbor_3d
                        &vc,
-                       Point &p
+                       Point &p,
+                       int id
 ) :
         p(p) {
     std::vector<double> vertex;
@@ -19,6 +20,7 @@ Polyhedron::Polyhedron(voro::voronoicell_neighbor_3d
         vertexPoints.push_back(p);
     }
     boudingBox = BoudingBox(vertexPoints);
+    this->id = id;
 }
 
 Point &Polyhedron::futherPoint(PointDouble &d) {
