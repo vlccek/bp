@@ -5,7 +5,7 @@
 #include "OctrerNodeBuilder.h"
 
 
-OctrerNodeBuilder::OctrerNodeBuilder(int level, int *maxLevel) {
+OctrerNodeBuilder::OctrerNodeBuilder(int level, int *maxLevel, voro::container_3d *con) {
     this->maxLevel = maxLevel;
     this->level = level;
 
@@ -13,22 +13,17 @@ OctrerNodeBuilder::OctrerNodeBuilder(int level, int *maxLevel) {
         *maxLevel = level;
     }
     voronoiCells = {};
+     con = con;
 }
 
-void OctrerNodeBuilder::addVoroCell(Polyhedron *vc) {
-    voronoiCells.push_back(vc);
-}
+
 
 void OctrerNodeBuilder::buildTree() {
     if (border.isTooSmall()) {
         std::cout << "Unable to build tree becouse the region is too small" << std::endl;
-
-        border.writeGnuFormat();
-        // todo remove this
         exit(10);
     }
 
-    std::vector<std::vector<Polyhedron*>> tvojemama;
     std::vector<Box> splitedBox = border.splitBoxBy8();
     for (int l = 0; l < splitedBox.size(); ++l) {
         for (auto &voronoiCell: voronoiCells) {
@@ -57,7 +52,7 @@ void OctrerNodeBuilder::buildTree() {
 void OctrerNodeBuilder::alocateIfNeccesary(int index, Box &b) {
     if (childs[index] == nullptr) {
         childCount++;
-        childs[index] = new OctrerNodeBuilder(level + 1, maxLevel);
+        childs[index] = new OctrerNodeBuilder(level + 1, maxLevel, this->con);
         childs[index]->border = b;
         childs[index]->addAllVoroCell(allVoronoiCells);
     }

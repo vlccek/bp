@@ -100,9 +100,9 @@ std::vector<Box> splitboxby8(const Point &minP, const Point &maxP) {
     const Point min = minP;
     const Point max = maxP;
     // Rozdělení podle středu každé strany
-    float midX = (min.x + max.x) / 2.0;
-    float midY = (min.y + max.y) / 2.0;
-    float midZ = (min.z + max.z) / 2.0;
+    float midX = (min.x + max.x) / 2.0f;
+    float midY = (min.y + max.y) / 2.0f;
+    float midZ = (min.z + max.z) / 2.0f;
 
     // Vytvoření osmi podboxů
     result.push_back(Box(min, Point(midX, midY, midZ)));                    // Levý spodní přední

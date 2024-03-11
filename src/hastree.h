@@ -57,7 +57,8 @@ inline PointGeneric<U> normalizePoint(PointGeneric<U> p, PointGeneric<V> min, Po
 
 
 class HashOctree {
-    OctrerNodeBuilder *root = new OctrerNodeBuilder(0, &maxLevel);
+    OctrerNodeBuilder *root;
+    voro::container_3d con;
     std::vector<Polyhedron> voronoiCells;
     int maxLevel = 0;
     int minLeafLevel = 0;

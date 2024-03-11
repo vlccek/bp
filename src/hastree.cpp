@@ -5,14 +5,17 @@
 #include "hastree.h"
 
 HashOctree::HashOctree(std::vector<Point> &p, const Point &min, const Point &max, int threads)
-        : min(min), max(max) {
+        : min(min), max(max),
+          con(min.x, max.x, min.y, max.y, min.z, max.z, 160, 160, 160, false, false, false, 8, threads) {
+    root = new OctrerNodeBuilder(0, &maxLevel, &con);
+
+
     std::cout << std::format("HashOctree with {}", threads) << std::endl;
-    voro::container_3d con(min.x, max.x, min.y, max.y, min.z, max.z, 160, 160, 160, false, false, false, 8, threads);
     pointCount = (p.size());
 
     int id = 0;
     for (auto &i: p) {
-        con.put( id++, i.x, i.y, i.z);
+        con.put(id++, i.x, i.y, i.z);
     }
 
     voronoiCells.reserve(pointCount);
@@ -71,7 +74,6 @@ HashOctree::HashOctree(std::vector<Point> &p, const Point &min, const Point &max
 }
 
 
-
 void HashOctree::initTree() {
     for (int i = 0; i < voronoiCells.size(); ++i) {
         root->addVoroCell(&(this->voronoiCells[i]));
@@ -95,6 +97,8 @@ void HashOctree::buildHashTable() {
 
         std::unordered_map<std::pair<int, std::tuple<int, int, int>>, OctrerNodeBuilder *> hashTableThread;
         //hashTableThread.reserve(allNodes.size());
+        // https://en.cppreference.com/w/cpp/container/unordered_map/load_factor
+        // zkusit realoakace
 
 #pragma omp for
         for (auto i: nodes) {
@@ -109,7 +113,6 @@ void HashOctree::buildHashTable() {
             hashTable.merge(hashTableThread);
         }
     }
-
 }
 
 
@@ -188,8 +191,6 @@ void HashOctree::printNodePoints(OctrerNodeBuilder *value) {
     for (auto j: value->voronoiCells) {
         std::cout << std::format("      ({:.2f},{:.2f},{:.2f})", j->p.x, j->p.y, j->p.z);
         std::cout << "\n";
-
-
     }
 }
 

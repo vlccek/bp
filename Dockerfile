@@ -10,8 +10,10 @@ ENV CXX=/usr/bin/clang++
 
 COPY . /app
 
-RUN gcc --version 
 RUN cd app/ && cmake -DCMAKE_BUILD_TYPE=Release -GNinja .
 RUN cd app/ && ninja bp
+
+ARG OMP_NUM_THREADS=10
+
 
 ENTRYPOINT ["app/bp"]
