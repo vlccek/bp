@@ -27,8 +27,7 @@
 class OctrerNodeBuilder {
 
 public:
-    explicit OctrerNodeBuilder(int level, int *maxLevel, voro::container_3d *con,
-                               std::vector<Polyhedron > *allVoronoiCells = nullptr);
+    explicit OctrerNodeBuilder(int level, int *maxLevel);
 
     Box border = Box({0, 0, 0}, {0, 0, 0});
 
@@ -38,8 +37,6 @@ public:
 
 
     std::vector<Polyhedron *> voronoiCells;
-    std::vector<Polyhedron> *allVoronoiCells;
-    voro::container_3d *con;
     std::array<OctrerNodeBuilder *, 8> childs = {0};
 
     inline void setBox(PointDouble &min, PointDouble &max) {
@@ -57,8 +54,6 @@ public:
     inline void addVoroCell(Polyhedron *vc) {
         voronoiCells.push_back(vc);
     }
-
-    void addAllVoroCell(std::vector<Polyhedron > *vcVector);
 
     void getLeafs(std::vector<OctrerNodeBuilder *> &leafs);
 

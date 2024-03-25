@@ -16,10 +16,12 @@ const int milion = 1000000;
 
 int main() {
 
-    auto p = genPoints<0, 100>(milion);
+    auto p = genPoints<0, 100>(1000000);
+
 
     HashOctree tree(p, 0,100, omp_get_max_threads());
-    
+
+    tree.nn(p[4]);
 
     return 0;
 }

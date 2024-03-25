@@ -20,10 +20,13 @@ class Box {
 public:
     Point min;
     Point max;
+    std::array<Box,8> *splited = nullptr;
 
     Box(Point &min, Point &max);
 
     Box(Point min, Point max);
+
+    ~Box();
 
     inline std::array<Point, 8> allVertex() {
         std::array<Point, 8> a = {
@@ -46,25 +49,36 @@ public:
         writeGnuFormat(filename);
     };
 
-    std::vector<Box> splitBoxBy8();
+    std::array<Box,8> splitBoxBy8();
 
 
     Box(float xa, float ya, float za, float xb, float yb, float zb);
 
-    inline bool isInside(Point point) const {
-        if (point > min && point < max) {
+    inline bool isInside(Point &point) const {
+        bool bigger = point > min;
+        bool smaller = point < max;
+        if (bigger && smaller) {
             return true;
         }
         return false;
     }
 
     inline bool isInside(std::array<Point, 8> &p) const {
-        for (auto i: p) {
+        for (auto &i: p) {
             if (isInside(i))
                 return true;
         }
         return false;
     }
+
+    inline bool isInside(std::vector<Point> &p) const {
+        for (int i = 0; i < p.size(); ++i) {
+            if (isInside(p[i]))
+                return true;
+        }
+        return false;
+    }
+
 
     /**
      * Check if the box is inside another box
@@ -85,7 +99,6 @@ public:
         return false;
 
     }
-
 
     inline Point center() const {
         Point edge = max - min;
@@ -123,7 +136,7 @@ public:
 };
 
 
-std::vector<Box> splitboxby8(const Point &minP, const Point &maxP);
+std::array<Box,8> splitboxby8(const Point &minP, const Point &maxP);
 
 class BoudingBox : public Box {
 

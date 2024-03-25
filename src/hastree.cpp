@@ -7,7 +7,7 @@
 HashOctree::HashOctree(std::vector<Point> &p, const Point &min, const Point &max, int threads)
         : min(min), max(max),
           con(min.x, max.x, min.y, max.y, min.z, max.z, 160, 160, 160, false, false, false, 8, threads) {
-    root = new OctrerNodeBuilder(0, &maxLevel, &con, &voronoiCells);
+    root = new OctrerNodeBuilder(0, &maxLevel);
 
 
     std::cout << std::format("HashOctree with {}", threads) << std::endl;
@@ -17,43 +17,29 @@ HashOctree::HashOctree(std::vector<Point> &p, const Point &min, const Point &max
     for (auto &i: p) {
         con.put(id++, i.x, i.y, i.z);
     }
-
-    voronoiCells.reserve(pointCount);
-
-    voro::container_3d::iterator cli;
+        voro::container_3d::iterator cli;
 
     start = chrono::high_resolution_clock::now();
 
+    voronoiCells.resize(pointCount);
 #pragma omp parallel
     {
-        std::vector<Polyhedron> v;
-        voro::voronoicell_neighbor_3d c(con);
+        voro::voronoicell_3d c(con);
         double x, y, z;
 #pragma omp for
         for (cli = con.begin(); cli < con.end(); cli++) {
             if (con.compute_cell(c, cli)) {
                 con.pos(cli, x, y, z);
                 Point po(x, y, z);
-                auto poly = Polyhedron(c, po, cli.ptr.q);
+                auto poly = Polyhedron(c, po);
 
-                std::vector<int> neighbors;
-                c.neighbors(neighbors);
-                poly.setNeigbors(neighbors);
 
-                v.push_back(poly);
+                int index = cli-con.begin();
+                voronoiCells[index] = poly;
 
             }
         }
-#pragma omp critical
-        {
-            voronoiCells.insert(voronoiCells.end(), v.begin(), v.end());
-        }
     }
-
-    std::sort(voronoiCells.begin(), voronoiCells.end(), [](const Polyhedron &a, const Polyhedron &b) {
-        return a.id < b.id;
-    });
-
 
     voroBuild = chrono::high_resolution_clock::now();
     auto duration = duration_cast<chrono::milliseconds>(voroBuild - start);
@@ -95,17 +81,18 @@ void HashOctree::buildHashTable() {
     hashTable.rehash(allNodes.size());
 
     std::vector<OctrerNodeBuilder *> nodes(allNodes.begin(), allNodes.end());
+    std::unordered_map<std::pair<int, std::tuple<int, int, int>>, OctrerNodeBuilder *> hashTableThreads[omp_get_max_threads()];
 #pragma omp parallel
     {
         std::tuple<int, int, int> p;
 
-        std::unordered_map<std::pair<int, std::tuple<int, int, int>>, OctrerNodeBuilder *> hashTableThread;
+        std::unordered_map<std::pair<int, std::tuple<int, int, int>>, OctrerNodeBuilder *> &hashTableThread = hashTableThreads[omp_get_thread_num()];
         //hashTableThread.reserve(allNodes.size());
         // https://en.cppreference.com/w/cpp/container/unordered_map/load_factor
         // zkusit realoakace
 
 #pragma omp for
-        for (auto i: nodes) {
+        for (OctrerNodeBuilder* i: nodes) {
             p = findBellogingIntervalsByLevel(i->border.center(), i->level);
             auto pair = std::make_pair(i->level, p);
 
@@ -121,7 +108,7 @@ void HashOctree::buildHashTable() {
 
 
 Point HashOctree::nn(Point &p) {
-#if 1
+#if 0
     if (maxLevel < 2) { // todo add connection to max number of points in node
         return findClosesPointInNode(p, root);
     }

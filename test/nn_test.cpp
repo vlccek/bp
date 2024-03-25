@@ -25,7 +25,7 @@ class TestNNalgorithm :
 
 INSTANTIATE_TEST_SUITE_P(numberOfPoints,
                          TestNNalgorithm,
-                         ::testing::Values(20, 100, 1000, 10000, 100000, 1000000, 10000000,
+                         ::testing::Values(5,20, 100, 1000, 10000, 100000, 1000000, 10000000,
                                            100000000
                          )
 );

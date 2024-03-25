@@ -21,9 +21,15 @@ Box::Box(float xa, float ya, float za, float xb, float yb, float zb)
     // empty :)
 }
 
+Box::~Box() {
+    delete splited;
+}
 
-std::vector<Box> Box::splitBoxBy8() {
+
+std::array<Box, 8> Box::splitBoxBy8() {
+
     return splitboxby8(min, max);
+
 }
 
 void Box::writeGnuFormat(std::string &filename) {
@@ -31,7 +37,7 @@ void Box::writeGnuFormat(std::string &filename) {
     file.open(filename);
     int id = 0;
     auto allVertex = this->allVertex();
-    for (auto l: {0,1,2,3,0,7,5,3,5,4,6,7,5,4,2,1,6}) {
+    for (auto l: {0, 1, 2, 3, 0, 7, 5, 3, 5, 4, 6, 7, 5, 4, 2, 1, 6}) {
         auto i = allVertex[l];
         file << std::format("{} {} {}", i.x, i.y, i.z) << std::endl;
     }
@@ -92,10 +98,9 @@ BoudingBox::BoudingBox(std::vector<Point> &vertex) : Box(
 }
 
 
-std::vector<Box> splitboxby8(const Point &minP, const Point &maxP) {
-    std::vector<Box> result;
+std::array<Box, 8> splitboxby8(const Point &minP, const Point &maxP) {
 
-   // std::cout << std::format("splitboxby8 with min: {} and max: {}\n", minP.operator std::string(), maxP.operator std::string());
+    // std::cout << std::format("splitboxby8 with min: {} and max: {}\n", minP.operator std::string(), maxP.operator std::string());
 
     const Point min = minP;
     const Point max = maxP;
@@ -105,15 +110,16 @@ std::vector<Box> splitboxby8(const Point &minP, const Point &maxP) {
     float midZ = (min.z + max.z) / 2.0f;
 
     // Vytvoření osmi podboxů
-    result.push_back(Box(min, Point(midX, midY, midZ)));                    // Levý spodní přední
-    result.push_back(Box(Point(midX, min.y, min.z), Point(max.x, midY, midZ))); // Pravý spodní přední
-    result.push_back(Box(Point(min.x, midY, min.z), Point(midX, max.y, midZ))); // Levý horní přední
-    result.push_back(Box(Point(midX, midY, min.z), Point(max.x, max.y, midZ))); // Pravý horní přední
-    result.push_back(Box(Point(min.x, min.y, midZ), Point(midX, midY, max.z))); // Levý spodní zadní
-    result.push_back(Box(Point(midX, min.y, midZ), Point(max.x, midY, max.z))); // Pravý spodní zadní
-    result.push_back(Box(Point(min.x, midY, midZ), Point(midX, max.y, max.z))); // Levý horní zadní
-    result.push_back(Box(Point(midX, midY, midZ), max));
-
+    std::array<Box, 8> result = {
+            Box(min, {midX, midY, midZ}),
+            Box({midX, min.y, min.z}, {max.x, midY, midZ}),
+            Box({min.x, midY, min.z}, {midX, max.y, midZ}),
+            Box({midX, midY, min.z}, {max.x, max.y, midZ}),
+            Box({min.x, min.y, midZ}, {midX, midY, max.z}),
+            Box({midX, min.y, midZ}, {max.x, midY, max.z}),
+            Box({min.x, midY, midZ}, {midX, max.y, max.z}),
+            Box({midX, midY, midZ}, max)
+    };
     return result;
 }
 
