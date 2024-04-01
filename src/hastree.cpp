@@ -17,7 +17,7 @@ HashOctree::HashOctree(std::vector<Point> &p, const Point &min, const Point &max
     for (auto &i: p) {
         con.put(id++, i.x, i.y, i.z);
     }
-        voro::container_3d::iterator cli;
+    voro::container_3d::iterator cli;
 
     start = chrono::high_resolution_clock::now();
 
@@ -34,7 +34,7 @@ HashOctree::HashOctree(std::vector<Point> &p, const Point &min, const Point &max
                 auto poly = Polyhedron(c, po);
 
 
-                int index = cli-con.begin();
+                int index = cli - con.begin();
                 voronoiCells[index] = poly;
 
             }
@@ -92,7 +92,7 @@ void HashOctree::buildHashTable() {
         // zkusit realoakace
 
 #pragma omp for
-        for (OctrerNodeBuilder* i: nodes) {
+        for (OctrerNodeBuilder *i: nodes) {
             p = findBellogingIntervalsByLevel(i->border.center(), i->level);
             auto pair = std::make_pair(i->level, p);
 

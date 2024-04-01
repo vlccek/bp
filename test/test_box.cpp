@@ -200,7 +200,7 @@ TEST(Box, isInsideVoronoi) {
 
 TEST(Box, futherpoint) {
     Box b = Box({0, 0, 0}, {1, 1, 1});
-    auto fp = b.futherPoint(b.max);
+    auto fp = b.futherstPoint(b.max);
     EXPECT_EQ(fp, b.min);
 }
 

@@ -2,141 +2,43 @@
 
 #include "gjk.h"
 
+bool isBegininside(std::vector<Point> &p) {
+  auto b = BoudingBox(p);
+  Point ploint(0, 0, 0);
+  return b.isInside(ploint);
+}
 
 bool gjk(Box &b, Polyhedron *p) {
-    PointDouble direction = b.center() - p->p; // compute the base direction as difference of centers of box and polyhedron
 
-    std::vector<PointDouble> simplex;
-    PointDouble a = support(b, p, direction);
-    simplex.insert(simplex.begin(), a);
-    direction = -a;
+  std::array<Point, 8> boxVertex = b.allVertex();
+  std::vector<Point> polyVertex = p->vertexPoints;
 
-    while (true) {
-        a = support(b, p, direction);
-        if ((a * direction) < 0) {
-            auto ahoj = &p->vertexPoints;
+  std::vector<Point> minikowskiDiff;
 
-            if (b.isInside(ahoj)) {
-                std::cout << "is inside" << std::endl;
-
-            }
-            std::cout << std::format("false box: {} \n polyhedron: {}  \n", std::string(b), std::string(*p));
-
-            return false;
-        }
-        simplex.insert(simplex.begin(), a);
-
-        if (nextSimplex(simplex, direction)) {
-            std::cout << std::format("True box: {} \n polyhedron: {}  \n", std::string(b), std::string(*p));
-
-            return true;
-        }
-
+  for (auto &i : boxVertex) {
+    for (auto &j : polyVertex) {
+      minikowskiDiff.push_back(i - j);
     }
-    return false;
+  }
 
-
-}
-
-bool samedirection(const Point &direction, const Point &ao) {
-    return (direction * ao) > 0;
+  return isBegininside(minikowskiDiff);
 }
 
 
-bool line(std::vector<Point> &simplex, Point &direction) {
-    Point a = simplex[0];
-    Point b = simplex[1];
 
-    Point ab = b - a;
-    Point a0 = -a;
-
-    if (samedirection(ab, a0)) {
-        direction = cross(cross(ab, a0), ab);
-    } else {
-        simplex = {a};
-        direction = a0;
+Point findFurherestPoint(std::vector<Point> &p, Point &d) {
+  float maxdist = std::numeric_limits<float>::min();
+  Point &mindistPoint = d;
+  for (auto &i : p) {
+    float dist = dot(i, d);
+    if (dist > maxdist) {
+      maxdist = dist;
+      mindistPoint = i;
     }
-    return false;
+  }
+  return mindistPoint;
 }
 
-
-bool triangle(std::vector<Point> &simplex, Point &direction) {
-    Point a = simplex[0];
-    Point b = simplex[1];
-    Point c = simplex[2];
-
-    Point ab = b - a;
-    Point ac = c - a;
-    Point ao = -a;
-
-    Point abc = cross(ab, ac);
-
-    if (samedirection(cross(abc, ac), ao)) {
-        if (samedirection(ac, ao)) {
-            simplex = {a, c};
-            direction = cross(cross(ac, ao), ac);
-        } else {
-            return line(simplex = {a, b}, direction);
-        }
-    } else {
-        if (samedirection(cross(ab, abc), ao)) {
-            return line(simplex = {a, b}, direction);
-        } else {
-            if (samedirection(abc, ao)) {
-                direction = abc;
-            } else {
-                simplex = {a, c, b};
-                direction = -abc;
-            }
-        }
-    }
-
-    return false;
-}
-
-bool tetrahedron(std::vector<Point> &simplex, Point &direction) {
-    Point a = simplex[0];
-    Point b = simplex[1];
-    Point c = simplex[2];
-    Point d = simplex[3];
-
-    Point ab = b - a;
-    Point ac = c - a;
-    Point ad = d - a;
-    Point ao = -a;
-
-    Point abc = cross(ab, ac);
-    Point acd = cross(ac, ad);
-    Point adb = cross(ad, ab);
-
-    if (samedirection(abc, ao)) {
-        return triangle(simplex = {a, b, c}, direction);
-    }
-
-    if (samedirection(acd, ao)) {
-        return triangle(simplex = {a, c, d}, direction);
-    }
-
-    if (samedirection(adb, ao)) {
-        return triangle(simplex = {a, d, b}, direction);
-    }
-
-    return true;
-}
-
-bool nextSimplex(std::vector<Point> &simplex, Point &direction) {
-    switch (simplex.size()) {
-        case 2:
-            return line(simplex, direction);
-        case 3:
-            return triangle(simplex, direction);
-        case 4:
-            return tetrahedron(simplex, direction);
-    }
-    return false;
-}
-
-PointDouble support(Box &b, Polyhedron *p, PointDouble d) {
-    auto minusd = -d;
-    return b.futherPoint(d) - p->futherPoint(minusd);
+float dot(const Point &a, const Point &b) {
+  return a.x * b.x + a.y * b.y + a.z * b.z;
 }

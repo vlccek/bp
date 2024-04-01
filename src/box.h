@@ -124,8 +124,18 @@ public:
         return false;
     }
 
-    inline Point &futherPoint(Point &d) {
-        return min;
+    inline Point &futherstPoint(Point &d) {
+
+        float maxdist = std::numeric_limits<float>::min();
+        Point &mindistPoint = d;
+        for (auto &i: allVertex()) {
+            float dist = d.distance(i);
+            if (dist > maxdist) {
+                maxdist = dist;
+                mindistPoint = i;
+            }
+        }
+        return mindistPoint;
     }
 
     inline bool isTooSmall() const {

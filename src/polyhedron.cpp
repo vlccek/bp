@@ -35,7 +35,7 @@ Point &Polyhedron::futherPoint(PointDouble &d) {
 }
 
 
-Polyhedron::Polyhedron(std::vector<Point> &vertext, Point &centerPoint, voro::voronoicell_3d &cell) : p(
+Polyhedron::Polyhedron(std::vector<Point> &vertext, Point &centerPoint) : p(
         centerPoint) {
 
     for (auto &i: vertext) {

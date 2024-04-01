@@ -98,7 +98,7 @@ bool OctrerNodeBuilder::intersect(Box &b, Polyhedron &vc) {
     if (box.isInside(boudingboxVertexs)) {
         // use gjk algorithm to detect intersection
         //if 1 skips gjk algorithm and just return true (if bounding box intersects)
-#if 1
+#if 0
         return true;
 #else
         if (gjk(box, ph)) {
@@ -120,31 +120,41 @@ void OctrerNodeBuilder::buildTree() {
 
 #pragma omp parallel
     {
-#pragma omp for
-        for (int l = 0; l < splitedBox.size(); ++l) {
+#pragma omp single
+        {
+            for (int l = 0; l < splitedBox.size(); ++l) {
 
-            for (auto &voronoiCell: voronoiCells) {
-                Box &box = splitedBox[l];
-                Polyhedron *ph = voronoiCell;
+#pragma omp task 
+                {
+                    // go through all voronoi cells and decided if the cell intersects with the box
+                    for (auto &voronoiCell: voronoiCells) {
+                        Box &box = splitedBox[l];
+                        Polyhedron *ph = voronoiCell;
+                        if (intersect(box, *voronoiCell)) {
+                            alocateIfNeccesary(l, box);
+                            {
 
-                if (intersect(box, *voronoiCell)) {
-                    alocateIfNeccesary(l, box);
+                                childs[l]->addVoroCell(ph);
+
+                            };
+                        }
+
+                    }
+                    if (childs[l] != nullptr && childs[l]->voronoiCells.size() >= 5) // todo remove magic constant
                     {
 
-                        childs[l]->addVoroCell(ph);
+                        childs[l]->buildTree();
+                    }
 
-                    };
                 }
-
             }
-            if (childs[l] != nullptr && childs[l]->voronoiCells.size() >= 5) // todo remove magic constant
-            {
-                childs[l]->buildTree();
-            }
-
         }
     }
 }
+
+
+
+
 
 
 
