@@ -7,20 +7,22 @@
 #ifndef BP_GJK_H
 #define BP_GJK_H
 
-#include "point.h"
 #include "box.h"
+#include "point.h"
 #include "polyhedron.h"
-#include <iostream>
 #include <format>
+#include <iostream>
+
+class Simplex;
 
 /**
  * Function for computing new Point of interest
  * @param b box
  * @param p polyhedron
  * @param d direction of interest
- * @return new Point of interest
+ * @return new Point of minikoski difference
  */
-Point support(Box &b, Polyhedron *p, Point d);
+Point support(Box &b, Polyhedron *p, Point &d);
 
 /**
  * Main function for running intersecting check
@@ -36,7 +38,7 @@ bool gjk(Box &b, Polyhedron *p);
  * @param direction
  * @return
  */
-bool nextSimplex(std::vector<Point> &simplex, Point &direction);
+bool nextSimplex(Simplex &simplex, Point &direction);
 
 /**
  * Check if tetrahedron express intersection
@@ -44,7 +46,7 @@ bool nextSimplex(std::vector<Point> &simplex, Point &direction);
  * @param direction
  * @return if intersect
  */
-bool tetrahedron(std::vector<Point> &simplex, Point &direction);
+bool tetrahedron(Simplex &simplex, Point &direction);
 
 /**
  * Check if triangle express intersection
@@ -52,7 +54,7 @@ bool tetrahedron(std::vector<Point> &simplex, Point &direction);
  * @param direction
  * @return if intersect
  */
-bool triangle(std::vector<Point> &simplex, Point &direction);
+bool triangle(Simplex &simplex, Point &direction);
 
 /**
  * Check if triangle express intersection
@@ -60,8 +62,7 @@ bool triangle(std::vector<Point> &simplex, Point &direction);
  * @param direction
  * @return if intersect
  */
-bool line(std::vector<Point> &simplex, Point &direction);
-
+bool line(Simplex &simplex, Point &direction);
 
 /**
  * Compute if 2 vector are in same direction
@@ -71,8 +72,33 @@ bool line(std::vector<Point> &simplex, Point &direction);
  */
 bool sameDirection(const Point &direction, const Point &ao);
 
+Point findFurherestPoint(std::vector<Point> &p, Point &d);
 
-Point findFurherestPoint(std::vector<Point > &p, Point &d);
+float dot(const Point &a, const Point &b);
 
-float dot(const Point &a, const Point &b) ;
-#endif //BP_GJK_H
+class Simplex {
+  std::array<Point, 4> points = {
+      {Point(0, 0, 0), Point(0, 0, 0), Point(0, 0, 0), Point(0, 0, 0)}};
+  int simplex_size = 1;
+
+public:
+  Simplex() : simplex_size(0){};
+
+  Simplex &operator=(std::initializer_list<Point> list) {
+    simplex_size = 0;
+    for (Point point : list)
+      points[simplex_size++] = point;
+
+    return *this;
+  }
+
+  void push(Point p);
+
+  Point &operator[](int i) { return points[i]; }
+  int size() const { return simplex_size; }
+
+  auto begin() const { return points.begin(); }
+  auto end() const { return points.end() - (4 - simplex_size); }
+};
+
+#endif // BP_GJK_H

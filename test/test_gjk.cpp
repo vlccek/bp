@@ -51,4 +51,25 @@ TEST(GJKTest, NotCollision2) {
     Polyhedron polyhedron(vertexPoint, polyhedronCenter);
     EXPECT_FALSE(gjk(box, &polyhedron));
 }
+TEST(GJKTest, NotCollision) {
+    Point polyhedronCenter(0.5, 0.5, 0.5);
+
+    Box box(Point(0,0,0), Point(1,1,1));
+
+    Box box2(Point(2,2,2), Point(3,3,3));
+
+    auto ver = box2.allVertex();
+    std::vector<Point> vertexPoint = {
+        ver[0],
+        ver[1],
+        ver[2],
+        ver[3],
+        ver[4],
+        ver[5],
+        ver[6],
+        ver[7]
+    };
+    Polyhedron polyhedron(vertexPoint, polyhedronCenter);
+    EXPECT_FALSE(gjk(box, &polyhedron));
+}
 
