@@ -57,7 +57,7 @@ void OctrerNodeBuilder::printVoronoiCells(std::ofstream &file) {
 void OctrerNodeBuilder::getAllNodes(std::set<OctrerNodeBuilder *> &allNodes) {
 #pragma omp parallel
   {
-#pragma omp single
+#pragma omp for
     for (auto child : childs) {
       if (child == nullptr) {
         continue;
@@ -70,9 +70,6 @@ void OctrerNodeBuilder::getAllNodes(std::set<OctrerNodeBuilder *> &allNodes) {
   }
 }
 
-std::vector<OctrerNodeBuilder *> OctrerNodeBuilder::getAllNodes(){
-
-}
 
 
 bool OctrerNodeBuilder::intersect(Box &b, Polyhedron &vc) {
