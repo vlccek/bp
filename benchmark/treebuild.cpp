@@ -1,9 +1,8 @@
+#include "OctreeNode.h"
+#include "hastree.h"
+#include "randompoint.h"
 #include <benchmark/benchmark.h>
 #include <iostream>
-#include "OctrerNodeBuilder.h"
-#include "randompoint.h"
-#include "hastree.h"
-
 
 // https://github.com/google/benchmark/issues/1217
 static void treebuild_randompoints(benchmark::State &state) {

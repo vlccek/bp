@@ -21,19 +21,6 @@ Polyhedron::Polyhedron(voro::voronoicell_3d
     boudingBox = BoudingBox(vertexPoints);
 }
 
-Point &Polyhedron::futherPoint(PointDouble &d) {
-
-    std::pair<Point *, double> max{&vertexPoints[0], 0}; // saving point and his destination
-    for (int i = 0; i < vertexPoints.size(); i++) {
-        auto *procesPoint = &vertexPoints[i];
-        double distance = procesPoint->distance(d);
-        if (distance > max.second) {
-            max = {procesPoint, distance};
-        }
-    }
-    return *max.first;
-}
-
 
 Polyhedron::Polyhedron(std::vector<Point> &vertext, Point &centerPoint) : p(
         centerPoint) {

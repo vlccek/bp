@@ -6,6 +6,7 @@ add_executable(test_box test_box.cpp)
 add_executable(test_nn nn_test.cpp)
 add_executable(findbeloginginterval findbelogingInterval.cpp)
 add_executable(tree_test test_tree.cpp)
+add_executable(nn_accuracy nn_acceptance_test.cpp)
 target_link_libraries(test_point gtest gtest_main hashoctree)
 target_link_libraries(test_box gtest gtest_main hashoctree)
 target_link_libraries(test_gjk gtest gtest_main hashoctree)
@@ -13,6 +14,7 @@ target_link_libraries(test_nn gtest gtest_main hashoctree )
 # target_link_libraries(test_nn gtest gtest_main hashoctree -static-libgcc -static-libstdc++ -static)
 target_link_libraries(findbeloginginterval gtest gtest_main hashoctree)
 target_link_libraries(tree_test gtest gtest_main hashoctree)
+target_link_libraries(nn_accuracy hashoctree)
 
 add_test(NAME test_point COMMAND test_point)
 add_test(NAME test_box COMMAND test_box)
@@ -26,5 +28,7 @@ file(GLOB_RECURSE sources
 add_executable(alltests
         ${sources}
 )
+
+
 
 target_link_libraries(alltests gtest gtest_main hashoctree)

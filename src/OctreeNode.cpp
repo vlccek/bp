@@ -2,28 +2,31 @@
 // Created by jvlk on 18.10.23.
 //
 
-#include "OctrerNodeBuilder.h"
+#include "OctreeNode.h"
 
 #define ONLY_GJK 0
 
-OctrerNodeBuilder::OctrerNodeBuilder(int level, int *maxLevel) {
+OctreeNode::OctreeNode(int level, int *maxLevel, const int maxPointsIncell,
+                       OctreeNode *parent)
+    : maxPointsInNode(maxPointsIncell) {
   this->maxLevel = maxLevel;
   this->level = level;
+  this->parent = parent;
 
   if (level > *maxLevel) {
     *maxLevel = level;
   }
 }
 
-void OctrerNodeBuilder::alocateIfNeccesary(int index, Box &b) {
+void OctreeNode::alocateIfNeccesary(int index, Box &b) {
   if (childs[index] == nullptr) {
     childCount++;
-    childs[index] = new OctrerNodeBuilder(level + 1, maxLevel);
+    childs[index] = new OctreeNode(level + 1, maxLevel, maxPointsInNode, this);
     childs[index]->border = b;
   }
 }
 
-void OctrerNodeBuilder::getLeafs(std::vector<OctrerNodeBuilder *> &leafs) {
+void OctreeNode::getLeafs(std::vector<OctreeNode *> &leafs) {
   for (auto &child : childs) {
     if (child != nullptr) {
       if (child->childCount == 0) {
@@ -36,7 +39,7 @@ void OctrerNodeBuilder::getLeafs(std::vector<OctrerNodeBuilder *> &leafs) {
   }
 }
 
-OctrerNodeBuilder::~OctrerNodeBuilder() {
+OctreeNode::~OctreeNode() {
   for (auto &child : childs) {
     if (child != nullptr) {
       delete child;
@@ -44,7 +47,7 @@ OctrerNodeBuilder::~OctrerNodeBuilder() {
   }
 }
 
-void OctrerNodeBuilder::printVoronoiCells(std::ofstream &file) {
+void OctreeNode::printVoronoiCells(std::ofstream &file) {
   for (auto &vc : voronoiCells) {
     // file << vc->p.operator std::string() << std::endl;
     for (auto &p : vc->vertexPoints) {
@@ -54,7 +57,7 @@ void OctrerNodeBuilder::printVoronoiCells(std::ofstream &file) {
   }
 }
 
-void OctrerNodeBuilder::getAllNodes(std::set<OctrerNodeBuilder *> &allNodes) {
+void OctreeNode::getAllNodes(std::set<OctreeNode *> &allNodes) {
 #pragma omp parallel
   {
 #pragma omp for
@@ -70,9 +73,7 @@ void OctrerNodeBuilder::getAllNodes(std::set<OctrerNodeBuilder *> &allNodes) {
   }
 }
 
-
-
-bool OctrerNodeBuilder::intersect(Box &b, Polyhedron &vc) {
+bool OctreeNode::intersect(Box &b, Polyhedron &vc) {
   Polyhedron *ph = &vc;
   Point particle = vc.p;
   std::vector<Point> &vp = vc.vertexPoints; // vertex point of the voronoi cell
@@ -107,7 +108,7 @@ bool OctrerNodeBuilder::intersect(Box &b, Polyhedron &vc) {
   return false;
 }
 
-void OctrerNodeBuilder::buildTree() {
+void OctreeNode::buildTree() {
   if (border.isTooSmall()) {
     std::cout << "Unable to build tree becouse the region is too small"
               << std::endl;
@@ -131,12 +132,11 @@ void OctrerNodeBuilder::buildTree() {
             Polyhedron *ph = voronoiCell;
             if (intersect(box, *voronoiCell)) {
               alocateIfNeccesary(l, box);
-              { childs[l]->addVoroCell(ph); };
+              childs[l]->addVoroCell(ph);
             }
           }
           if (childs[l] != nullptr &&
-              childs[l]->voronoiCells.size() >= 5) // todo remove magic constant
-          {
+              childs[l]->voronoiCells.size() >= maxPointsInNode) {
 
             childs[l]->buildTree();
           }

@@ -48,8 +48,8 @@ add_library(hashoctree
         src/randompoint.h
         src/hastree.cpp
         src/hastree.h
-        src/OctreNodeBuilder.cpp
-        src/OctrerNodeBuilder.h
+        src/OctreeNode.cpp
+        src/OctreeNode.h
         src/box.cpp
         src/polyhedron.cpp
         src/gjk.cpp

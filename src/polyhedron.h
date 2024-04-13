@@ -42,8 +42,6 @@ public:
         return std::format("Vertex: {}", s);
     }
 
-
-    Point &futherPoint(PointDouble &d);
 };
 
 

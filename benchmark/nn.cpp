@@ -1,9 +1,8 @@
+#include "OctreeNode.h"
+#include "hastree.h"
+#include "randompoint.h"
 #include <benchmark/benchmark.h>
 #include <iostream>
-#include "OctrerNodeBuilder.h"
-#include "randompoint.h"
-#include "hastree.h"
-
 
 // https://github.com/google/benchmark/issues/1217
 static void basicnn(benchmark::State &state) {
@@ -23,7 +22,7 @@ static void basicnn(benchmark::State &state) {
 
     auto point = Point(0, 0, .99);
 
-    std::cerr << "Running benchmark with " << state.range() << "points. \n" << std::endl;
+    // std::cerr << "Running benchmark with " << state.range() << "points. \n" << std::endl;
     Point findedpoint(-1, -1, -1);
     for (auto _: state)
         findedpoint = tree.nn(point);
@@ -33,7 +32,7 @@ static void basicnn(benchmark::State &state) {
 }
 
 BENCHMARK(basicnn)->RangeMultiplier(2)
-        ->Range(1 << 10, 1 << 20)
-        ->Complexity(benchmark::o1);
+        ->Range(1 << 10, 1 << 15)
+        ->Complexity();
 
 BENCHMARK_MAIN();

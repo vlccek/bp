@@ -2,12 +2,11 @@
 #include "randompoint.h"
 
 #include "hastree.h"
+#include "omp.h"
 #include "voro++.hh"
 #include <format>
 #include <iostream>
 #include <random>
-#include "omp.h"
-
 
 using namespace voro;
 
@@ -16,12 +15,11 @@ const int milion = 1000000;
 
 int main() {
 
-    auto p = genPoints<0, 100>(1000000);
+  auto p = genPoints<0, 100>(10000);
 
+  HashOctree tree(p, 0, 100, omp_get_max_threads());
 
-    HashOctree tree(p, 0,100, omp_get_max_threads());
+  std::vector<Point *> res = tree.knn(p[4], 6);
 
-    tree.nn(p[4]);
-
-    return 0;
+  return 0;
 }
