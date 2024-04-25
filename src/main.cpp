@@ -1,5 +1,6 @@
 #include "point.h"
 #include "randompoint.h"
+#include <ranges>
 
 #include "hastree.h"
 #include "omp.h"
@@ -15,11 +16,15 @@ const int milion = 1000000;
 
 int main() {
 
-  auto p = genPoints<0, 100>(10000);
+  auto p = genPoints<0.f, 100.f>(1000);
 
-  HashOctree tree(p, 0, 100, omp_get_max_threads());
+  HashOctree tree(p, 0, 100, omp_get_max_threads(), 16);
 
-  std::vector<Point *> res = tree.knn(p[4], 6);
+  for (std::weakly_incrementable auto l : std::views::iota(0, 5000)) {
+    for (auto &i : p) {
+      auto res = tree.nn(i);
+    }
+  }
 
   return 0;
 }

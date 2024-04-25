@@ -1,0 +1,9 @@
+add_executable(nn_generate_neighbors generate_neighbor.cpp)
+target_link_libraries(nn_generate_neighbors hashoctree)
+
+add_executable(knn_accuracy neigbors_accuracy.cpp)
+target_link_libraries(knn_accuracy hashoctree)
+
+add_compile_definitions(NNTEST)
+add_executable(nn_accuracy neigbors_accuracy.cpp)
+target_link_libraries(nn_accuracy hashoctree)

@@ -10,7 +10,7 @@ bool gjk(Box &b, Polyhedron *p) {
   Simplex simplex;
   simplex.push(support_point);
 
-  int maxinterations = 8*p->vertexPoints.size();
+  int maxinterations = 8 *p->vertexPoints.size();
 
   direction = -support_point;
 

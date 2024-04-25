@@ -25,8 +25,8 @@ INSTANTIATE_TEST_SUITE_P(numberOfPoints,
 
 
 TEST_P(TestingTreeBuilding, ContainLeafnodesAllPoints){
-    constexpr int from = 0;
-    constexpr int to = 1;
+    constexpr float from = 0;
+    constexpr float to = 1;
 
     auto p = genPoints<from, to>(GetParam());
     std::vector<Point> points;

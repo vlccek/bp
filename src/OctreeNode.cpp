@@ -18,7 +18,7 @@ OctreeNode::OctreeNode(int level, int *maxLevel, const int maxPointsIncell,
   }
 }
 
-void OctreeNode::alocateIfNeccesary(int index, Box &b) {
+void OctreeNode::allocateIfNeccesary(int index, Box &b) {
   if (childs[index] == nullptr) {
     childCount++;
     childs[index] = new OctreeNode(level + 1, maxLevel, maxPointsInNode, this);
@@ -39,13 +39,6 @@ void OctreeNode::getLeafs(std::vector<OctreeNode *> &leafs) {
   }
 }
 
-OctreeNode::~OctreeNode() {
-  for (auto &child : childs) {
-    if (child != nullptr) {
-      delete child;
-    }
-  }
-}
 
 void OctreeNode::printVoronoiCells(std::ofstream &file) {
   for (auto &vc : voronoiCells) {
@@ -131,7 +124,7 @@ void OctreeNode::buildTree() {
             Box &box = splitedBox[l];
             Polyhedron *ph = voronoiCell;
             if (intersect(box, *voronoiCell)) {
-              alocateIfNeccesary(l, box);
+              allocateIfNeccesary(l, box);
               childs[l]->addVoroCell(ph);
             }
           }

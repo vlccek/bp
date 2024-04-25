@@ -1,14 +1,14 @@
 
 #include <benchmark/benchmark.h>
 #include <iostream>
-#include "OctrerNodeBuilder.h"
+#include "OctreeNode.h"
 #include "randompoint.h"
 
 static void vorocell_computation_pre(benchmark::State &state) {
     voro::container_3d con(-10, 10, -10, 10, -10, 10, 26, 26, 26, false, false, false, 8);
 
     for (int i = 0; i < state.range(0); i++) {
-        RandomPoint p(genNumber<-10, 10>);
+        RandomPoint p(genNumber<-10.f, 10.f>);
         con.put(i, p.x, p.y, p.z);
     }
 
@@ -34,7 +34,7 @@ static void vorocell_computation(benchmark::State &state) {
 
 
     for (int i = 0; i < state.range(0); i++) {
-        RandomPoint p(genNumber<-10, 10>);
+        RandomPoint p(genNumber<-10.f, 10.f>);
         con.put(i, p.x, p.y, p.z);
     }
 

@@ -6,33 +6,51 @@
 
 // https://github.com/google/benchmark/issues/1217
 static void basicnn(benchmark::State &state) {
-    std::vector<Point> p{
-            Point(0, 0, .95)
-    };
-    constexpr int from = 0;
-    constexpr int to = 100;
+  std::vector<Point> p{Point(0, 0, .95)};
+  constexpr int from = -1000000;
+  constexpr int to = 1000000;
 
+  int Mmax = state.range(1);
+  int points = state.range(0);
 
-    for (int i = 0; i < state.range(0); i++) {
-        p.push_back(RandomPoint(&genNumber<from, to>));
-        // std::cout << std::format("({},{},{})", p[p.size() - 1].x, p[p.size() - 1].y, p[p.size() - 1].z) << std::endl;
-    }
+  for (int i = 0; i < state.range(0); i++) {
+    p.push_back(RandomPoint(&genNumber<from, to>));
+    // std::cout << std::format("({},{},{})", p[p.size() - 1].x, p[p.size() -
+    // 1].y, p[p.size() - 1].z) << std::endl;
+  }
 
-    HashOctree tree(p, from, to);
+  HashOctree tree(p, from, to, omp_get_max_threads(), Mmax);
 
-    auto point = Point(0, 0, .99);
+  int counter = 0;
 
-    // std::cerr << "Running benchmark with " << state.range() << "points. \n" << std::endl;
-    Point findedpoint(-1, -1, -1);
-    for (auto _: state)
-        findedpoint = tree.nn(point);
+  auto test = RandomPoint(&genNumber<from, to>);
 
-
-    state.SetComplexityN(state.range(0));
+  // std::cerr << "Running benchmark with " << state.range() << "points. \n" <<
+  // std::endl;
+  Point foundedpoint(-1, -1, -1);
+  for (auto _ : state) {
+    foundedpoint = tree.nn(test);
+    state.PauseTiming();
+    test = RandomPoint(&genNumber<from, to>);
+    state.ResumeTiming();
+  }
+  state.SetComplexityN(state.range(0));
 }
 
-BENCHMARK(basicnn)->RangeMultiplier(2)
-        ->Range(1 << 10, 1 << 15)
-        ->Complexity();
+static void CustomArguments_withoutthr(benchmark::internal::Benchmark *b) {
+
+  int MmaxMax = 30;
+  int pointsMax = 100000000;
+
+  for (int points = 10000000; points <= pointsMax; points *= 10)
+    for (int Mmax : {8, 16, 32, 64, 96}) {
+      if ((Mmax ==  8 || Mmax == 16) && points > 1000000) {
+        continue;
+      }
+      b->Args({points, Mmax});
+    }
+}
+
+BENCHMARK(basicnn)->Apply(CustomArguments_withoutthr)->Complexity();
 
 BENCHMARK_MAIN();

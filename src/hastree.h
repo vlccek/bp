@@ -23,6 +23,7 @@
 #include "polyhedron.h"
 #include "voro++.hh"
 #include <chrono>
+#include <immintrin.h>
 #include <omp.h>
 // #include "gjk.h"
 
@@ -49,23 +50,35 @@ template <> struct std::hash<std::pair<int, std::tuple<int, int, int>>> {
   }
 };
 
-inline Point normalizePoint(Point p, Point min, Point max) {
-  return (p - min) / (max - min);
+inline __m256 normalizePoint(Point p, Point min, Point max) {
+  __m256 pVec = _mm256_set_ps(0, p.z, p.y, p.x, 0, p.z, p.y, p.x);
+  __m256 minVec = _mm256_set_ps(0, min.z, min.y, min.x, 0, min.z, min.y, min.x);
+  __m256 maxVec = _mm256_set_ps(0, max.z, max.y, max.x, 0, max.z, max.y, max.x);
+
+  // Subtract min from p and max
+  __m256 pMinusMin = _mm256_sub_ps(pVec, minVec);
+  __m256 maxMinusMin = _mm256_sub_ps(maxVec, minVec);
+
+  // Divide (p - min) / (max - min)
+  __m256 result = _mm256_div_ps(pMinusMin, maxMinusMin);
+
+  return result;
 }
 
 class HashOctree {
   OctreeNode *root;
   voro::container_3d con;
   std::vector<Polyhedron> voronoiCells;
-  int maxLevel = 0;
+
   int minLeafLevel = 0;
+
+public:
+  int maxLevel = 0;
   chrono::time_point<chrono::high_resolution_clock> start;
   chrono::time_point<chrono::high_resolution_clock> voroBuild;
   chrono::time_point<chrono::high_resolution_clock> treeBuild;
   chrono::time_point<chrono::high_resolution_clock> htBuild;
 
-
-public:
   Point min, max;
 
   const int maxPointsInNode = 5;
@@ -109,6 +122,8 @@ public:
 
   void buildHashTable();
 
+  void createArrayofPoints();
+
   void printHashTable();
 
   std::vector<OctreeNode *> getLeafs();
@@ -126,48 +141,55 @@ public:
    * @param p point
    * @return the closes point
    */
-  Point nn(Point &p);
+  Point &nn(Point &p);
 
   std::vector<Point *> knn(Point &p, int k);
 
+  OctreeNode *findClosesNode(Point &p);
 
-  OctreeNode * findClosesNode(Point &p);
-
-  Point findClosesPointInNode(Point &p, const OctreeNode *node);
+  Point &findClosesPointInNode(Point &p, const OctreeNode *node);
+  Point &findClosesPointInNodeLeaf(Point &p, const OctreeNode *node);
 
   inline std::tuple<int, int, int>
   findBellogingIntervalsByLevel(Point p, int level) const {
-    if (level == 0) {
+
+    if (level == 0)
       return std::make_tuple(0, 0, 0);
-    }
-    auto normalizedPoint = normalizePoint(p, min, max);
+
+    __m256 normalizedPoint = normalizePoint(p, min, max);
+
+    // if the point is on the edge of the box, then it is in the last box
+    // so we need to subtract a small number from the point
 
     int boxCount = 1 << (level);
-    return std::make_tuple(
-        // if the point is on the edge of the box, then it is in the last box
-        static_cast<int>(((normalizedPoint.x) * boxCount == boxCount)
-                             ? boxCount - 1
-                             : (normalizedPoint.x) * boxCount),
-        static_cast<int>(((normalizedPoint.y) * boxCount == boxCount)
-                             ? boxCount - 1
-                             : (normalizedPoint.y) * boxCount),
-        static_cast<int>(((normalizedPoint.z) * boxCount == boxCount)
-                             ? boxCount - 1
-                             : (normalizedPoint.z) * boxCount));
+
+    __m256 boxCountVec = _mm256_set1_ps(static_cast<float>(boxCount));
+
+    __m256 boxf = normalizedPoint * boxCountVec;
+    __m256i box = _mm256_cvttps_epi32(boxf);
+
+    // correction
+
+    __m256i correction = _mm256_cmpeq_epi32(box, _mm256_set1_epi32(boxCount));
+
+    box = _mm256_add_epi32(box, correction);
+    int *box_array = (int *)&box;
+
+    return {box_array[0], box_array[1], box_array[2]};
   }
 
-  inline void printBuildTimes(){
-    auto duration = duration_cast<chrono::milliseconds>(voroBuild - start);
+  inline void printBuildTimes() {
+    auto duration = duration_cast<chrono::nanoseconds>(voroBuild - start);
     cout << "Voronoi finish: " << duration.count() << "ms" << endl;
 
-    duration = duration_cast<chrono::milliseconds>(treeBuild - voroBuild);
+    duration = duration_cast<chrono::nanoseconds>(treeBuild - voroBuild);
     cout << "tree finish: " << duration.count() << "ms" << endl;
 
-    duration = duration_cast<chrono::milliseconds>(htBuild - treeBuild);
+    duration = duration_cast<chrono::nanoseconds>(htBuild - treeBuild);
     cout << "HT finish: " << duration.count() << "ms" << endl;
   }
 
-      private:
+public:
   std::unordered_map<std::pair<int, std::tuple<int, int, int>>, OctreeNode *>
       hashTable{};
   size_t pointCount = 0;
@@ -175,4 +197,24 @@ public:
   static void printNodePoints(OctreeNode *value);
 };
 
+inline int roundUp8(int x) { return ((x + 7) & (-8)); }
+
+inline float findMinimumOfEight(__m256 data_vec) {
+
+  // Překlápíme horní a dolní čtyři prvky a bereme minimum
+  __m256 permuted = _mm256_permute2f128_ps(data_vec, data_vec, 1);
+  __m256 min_vec = _mm256_min_ps(data_vec, permuted);
+
+  // Bereme minimum mezi prvními a druhými čtyřmi prvky
+  min_vec = _mm256_min_ps(
+      min_vec, _mm256_shuffle_ps(min_vec, min_vec, _MM_SHUFFLE(1, 0, 3, 2)));
+  min_vec = _mm256_min_ps(
+      min_vec, _mm256_shuffle_ps(min_vec, min_vec, _MM_SHUFFLE(2, 3, 0, 1)));
+
+  // Výsledek je v prvním prvku, ostatní prvky jsou irelevantní
+  float result = _mm256_cvtss_f32(
+      min_vec); // Konvertuje první prvek AVX vektoru na skalární float
+
+  return result;
+}
 #endif // BP_HASTREE_H

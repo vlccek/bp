@@ -4,7 +4,6 @@
 
 #include "hastree.h"
 
-
 // #define TREE_PRINT_BUILDTIME
 
 HashOctree::HashOctree(std::vector<Point> &p, const Point &min,
@@ -54,6 +53,7 @@ HashOctree::HashOctree(std::vector<Point> &p, const Point &min,
 
   htBuild = chrono::high_resolution_clock::now();
 
+  createArrayofPoints();
 #ifdef TREE_PRINT_BUILDTIME
   printBuildTimes();
 #endif
@@ -91,26 +91,28 @@ void HashOctree::buildHashTable() {
       p = findBellogingIntervalsByLevel(i->border.center(), i->level);
       auto pair = std::make_pair(i->level, p);
 
-      // hashTable[std::make_pair(i->level, p)] = i;
       hashTableThread.emplace(pair, i);
     }
 #pragma omp critical
     { hashTable.merge(hashTableThread); }
   }
+
+  hashTable.max_load_factor(0.5);
 }
 
-Point HashOctree::nn(Point &p) {
+Point &HashOctree::nn(Point &p) {
 
   OctreeNode *closesNode = findClosesNode(p);
 
   // printNodePoints(iterator->second);
-  return findClosesPointInNode(
+  return findClosesPointInNodeLeaf(
       p, closesNode); // find closes point in selected mode
 }
 
-Point HashOctree::findClosesPointInNode(Point &p, const OctreeNode *node) {
+Point &HashOctree::findClosesPointInNode(Point &p, const OctreeNode *node) {
   float smallestDistance = std::numeric_limits<float>::max();
   Point *closesPoint;
+
   for (auto &i : node->voronoiCells) {
     auto distance = i->p.distance(p);
     if (smallestDistance > distance) {
@@ -118,9 +120,53 @@ Point HashOctree::findClosesPointInNode(Point &p, const OctreeNode *node) {
       closesPoint = &i->p;
     }
   }
-  // std::cerr << std::format("for ({},{},{}), found: ({},{},{}), distance: {}",
-  // p.x,p.y,p.z, closesPoint->x, closesPoint->y,
-  // closesPoint->z,smallestDistance) << std::endl;
+
+  return *closesPoint;
+}
+
+Point &HashOctree::findClosesPointInNodeLeaf(Point &p, const OctreeNode *node) {
+  float smallestDistance = std::numeric_limits<float>::max();
+  Point *closesPoint;
+
+  __m256 basex = {p.x, p.x, p.x, p.x, p.x, p.x, p.x, p.x};
+  __m256 basey = {p.y, p.y, p.y, p.y, p.y, p.y, p.y, p.y};
+  __m256 basez = {p.z, p.z, p.z, p.z, p.z, p.z, p.z, p.z};
+
+  int voronoicellSize = node->voronoiCells.size();
+  for (int i = 0; i < voronoicellSize; i += 8) {
+    auto &int_voronoicell = node->voronoiCells;
+
+    __m256 x = _mm256_load_ps(&(node->x[i]));
+    __m256 y = _mm256_load_ps(&(node->y[i]));
+    __m256 z = _mm256_load_ps(&(node->z[i]));
+
+    __m256 diffx = x - basex;
+    __m256 diffy = y - basey;
+    __m256 diffz = z - basez;
+
+    __m256 diffxpow = diffx * diffx;
+    __m256 diffypow = diffy * diffy;
+    __m256 diffzpow = diffz * diffz;
+
+    __m256 add = diffxpow + diffypow + diffzpow;
+
+    __m256 distance = _mm256_sqrt_ps(add);
+
+
+    if (voronoicellSize - i < 8) {
+      float tmp[8] __attribute__((aligned(32)));
+      _mm256_store_ps(tmp, distance);
+      for (int j = 0; j < voronoicellSize - i; j++) {
+        if (tmp[j] < smallestDistance) {
+          smallestDistance = tmp[j];
+          closesPoint = &int_voronoicell[i + j]->p;
+        }
+      }
+      break;
+    } else {
+      findMinimumOfEight(distance);
+    }
+  }
   return *closesPoint;
 }
 
@@ -185,7 +231,7 @@ std::vector<Point *> HashOctree::knn(Point &p, int k) {
 }
 
 OctreeNode *HashOctree::findClosesNode(Point &p) {
-  int lmin = 0; // minimal leaf node level
+  int lmin = minLeafLevel; // minimal leaf node level
   int lmax = maxLevel;
   int lc;
 
@@ -194,8 +240,10 @@ OctreeNode *HashOctree::findClosesNode(Point &p) {
   while (lmax - lmin > 1) {
     lc = (lmax + lmin) / 2;
     idx = findBellogingIntervalsByLevel(p, lc);
-    auto iterator = this->hashTable.find(std::make_pair(lc, idx));
-    if (iterator != hashTable.end()) { // node does exists
+    auto pair = std::make_pair(lc, idx);
+    auto iterator = this->hashTable.find(pair);
+    if  (iterator != hashTable.end()) { // node does exists
+      [[likely]]
       lmin = lc;
       // change range to [lc, lmax]
     } else { // node does not exists
@@ -206,14 +254,25 @@ OctreeNode *HashOctree::findClosesNode(Point &p) {
 
   lc = (lmax + lmin) / 2;
   idx = findBellogingIntervalsByLevel(p, lc);
-  auto iterator = hashTable.find(std::make_pair(lc, idx));
-#if 0
-    if (iterator == hashTable.end()) {
+  auto pair = std::make_pair(lc, idx);
+  auto iterator = hashTable.find(pair);
 
-        std::cerr << std::format("not found: ({},{},{})", p.x, p.y, p.z) << std::endl;
-        return {0, 0, 0};
-    }
-#endif
+
 
   return iterator->second;
+}
+void HashOctree::createArrayofPoints() {
+
+  for (auto &i : hashTable) {
+    int countofVoroCell = (i.second->voronoiCells.size());
+    int countofVoroCellRoudnBy8 = roundUp8(countofVoroCell);
+    i.second->x = new (std::align_val_t(32)) float[countofVoroCellRoudnBy8];
+    i.second->y = new (std::align_val_t(32)) float[countofVoroCellRoudnBy8];
+    i.second->z = new (std::align_val_t(32)) float[countofVoroCellRoudnBy8];
+    for (int j = 0; j < i.second->voronoiCells.size(); j++) {
+      i.second->x[j] = i.second->voronoiCells[j]->p.x;
+      i.second->y[j] = i.second->voronoiCells[j]->p.y;
+      i.second->z[j] = i.second->voronoiCells[j]->p.z;
+    }
+  }
 }

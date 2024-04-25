@@ -38,6 +38,10 @@ public:
 
   const int maxPointsInNode;
 
+  float *x = nullptr;
+  float *y = nullptr;
+  float *z = nullptr;
+
   std::vector<Polyhedron *> voronoiCells;
   std::array<OctreeNode *, 8> childs = {0};
 
@@ -48,7 +52,7 @@ public:
 
   void buildTree();
 
-  void alocateIfNeccesary(int index, Box &b);
+  void allocateIfNeccesary(int index, Box &b);
 
   bool intersect(Box &b, Polyhedron &vc);
 
@@ -58,7 +62,16 @@ public:
 
   void printVoronoiCells(std::ofstream &file);
 
-  ~OctreeNode();
+  ~OctreeNode() {
+    for (auto &child : childs) {
+      if (child != nullptr) {
+        delete child;
+      }
+    }
+    if (x != nullptr) {
+      delete[] x;
+    };
+  };
 
   void getAllNodes(std::set<OctreeNode *> &allNodes);
 
@@ -73,7 +86,7 @@ public:
 
   inline OctreeNode *reverseTreeLookup(int reqquiredPoints) {
     OctreeNode *node = this;
-    while (node->voronoiCells.size() < reqquiredPoints*2) {
+    while (node->voronoiCells.size() < reqquiredPoints * 2) {
       if (node->parent == nullptr) {
         return node;
       }

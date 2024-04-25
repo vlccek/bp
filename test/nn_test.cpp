@@ -15,8 +15,8 @@ inline void PrintTo(const Point &p, ::std::ostream *os) {
     *os << std::format("({},{},{})", p.x, p.y, p.z);
 }
 
-constexpr int from = 0;
-constexpr int to = 100;
+constexpr float from = 0;
+constexpr float to = 100;
 
 
 class TestNNalgorithm :
@@ -204,7 +204,7 @@ class TestNNalgorithmNoParam :
 // Implementation limitation. Not working, infinite recursion
 TEST_F(TestNNalgorithmNoParam, gridTest3x3) {
 
-    constexpr int grid = 2;
+    constexpr float grid = 2;
 
     std::vector<Point> p = {
             {0.75, 0.75, .75},
@@ -229,7 +229,7 @@ TEST_F(TestNNalgorithmNoParam, gridTest3x3) {
 
 
 TEST_F(TestNNalgorithmNoParam, gridTest) {
-    constexpr int grid = 2;
+    constexpr float grid = 2;
 
     std::vector<Point> p;
 
