@@ -1,0 +1,130 @@
+@startuml
+
+
+
+
+
+/' Objects '/
+
+class BoudingBox {
+
+}
+
+
+class Box {
+	+max : Point
+	+min : Point
+	+splited : std::array<Box, 8>*
+}
+
+
+class HashOctree {
+	-root : OctreeNode*
+	+max : Point
+	+min : Point
+	+maxPointsInNode : const int
+	-maxLevel : int
+	-minLeafLevel : int
+	-pointCount : size_t
+	-voronoiCells : std::vector<Polyhedron>
+	-con : voro::container_3d
+}
+
+
+class OctreeNode {
+	+border : Box
+	+parent : OctreeNode*
+	+maxPointsInNode : const int
+	+childCount : int
+	+level : int
+	+maxLevel : int*
+	+voronoiCells : std::vector<Polyhedron*>
+}
+
+
+class Point {
+	+nor_x : float
+	+nor_y : float
+	+nor_z : float
+	+x : float
+	+y : float
+	+z : float
+}
+
+
+class Polyhedron {
+	+boudingBox : BoudingBox
+	+p : Point
+	+vertexPoints : std::vector<Point>
+	+neighbors : std::vector<int>
+}
+
+
+class RandomPoint {
+}
+
+
+class Simplex {
+	-simplex_size : int
+}
+
+
+class std::hashstd::pairint,std::tupleint,int,int <template<>> {
+}
+
+
+
+
+
+/' Inheritance relationships '/
+
+.Box <|-- .BoudingBox
+
+
+.Point <|-- .RandomPoint
+
+
+
+
+
+/' Aggregation relationships '/
+
+.Box *-- .Box
+
+
+.Box "2" *-- .Point
+
+
+.HashOctree o-- .OctreeNode
+
+
+.HashOctree "2" *-- .Point
+
+
+.HashOctree *-- .Polyhedron
+
+
+.OctreeNode *-- .Box
+
+
+.OctreeNode o-- .OctreeNode
+
+
+.OctreeNode o-- .Polyhedron
+
+
+.Polyhedron *-- .BoudingBox
+
+
+.Polyhedron "2" *-- .Point
+
+
+
+
+
+
+/' Nested objects '/
+
+
+
+@enduml
