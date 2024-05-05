@@ -9,22 +9,23 @@
 #include <iostream>
 #include <random>
 
-using namespace voro;
+constexpr float from = -1000000;
+constexpr float to = 1000000;
 
 const int ten_milion = 10000000;
 const int milion = 1000000;
 
 int main() {
 
-  auto p = genPoints<0.f, 100.f>(1000);
+  auto p = genPoints<from, to>(100000);
 
-  HashOctree tree(p, 0, 100, omp_get_max_threads(), 16);
+  HashOctree tree(p, from, to, omp_get_max_threads(), 8);
 
-  for (std::weakly_incrementable auto l : std::views::iota(0, 5000)) {
-    for (auto &i : p) {
-      auto res = tree.nn(i);
-    }
-  }
+  // for (std::weakly_incrementable auto l : std::views::iota(0, 5000))
+
+  Point test(0, 0, 0);
+
+  auto res = tree.knn(test, 512);
 
   return 0;
 }

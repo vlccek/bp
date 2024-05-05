@@ -10,6 +10,6 @@
 
 - cmake
 - gcc 13 (nebo jiný C++ překladač pro c++20 s podporou std::format a std::ranges) s přislušnou std knihovnou. 
-- openmp 3.0
+- openmp 4.5
 
 

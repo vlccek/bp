@@ -25,8 +25,8 @@ if (OPENMP_FOUND)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif ()
 
-#add_compile_options(-fsanitize=address)
-#add_link_options(-fsanitize=address)
+# add_compile_options(-fsanitize=address)
+# add_link_options(-fsanitize=address)
 
 
 include_directories(src)
@@ -69,12 +69,12 @@ add_library(hashoctree
 target_link_libraries(hashoctree voro++)
 
 
-add_executable(bp
+add_executable(main
         src/main.cpp
         src/polyhedron.cpp
 )
 
-target_link_libraries(bp voro++ hashoctree)
+target_link_libraries(main voro++ hashoctree)
 
 
 

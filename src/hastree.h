@@ -27,6 +27,10 @@
 #include <omp.h>
 // #include "gjk.h"
 
+inline float dotNorm(Point &a, Point &b) {
+  return a.nor_x * b.nor_x + a.nor_y * b.nor_y + a.nor_z * b.nor_z;
+}
+
 template <> struct std::hash<std::pair<int, std::tuple<int, int, int>>> {
   std::size_t
   operator()(const std::pair<int, std::tuple<int, int, int>> &k) const {
@@ -48,6 +52,34 @@ template <> struct std::hash<std::pair<int, std::tuple<int, int, int>>> {
 
     return seed;
   }
+};
+
+class nnNormalIterator {
+  std::vector<Point *> points;
+  int counter = 0;
+  Point p;
+
+public:
+  nnNormalIterator(std::vector<Point *> points, Point &p)
+      : points(points), p(p){
+                            // empty
+                        };
+  Point *next() {
+
+    auto normalCmp = [this](Point *a, Point *b) {
+      return dotNorm(*a, p) < dotNorm(*b, p);
+    };
+    auto resultIterator =
+        std::max_element(points.begin(), points.end(), normalCmp);
+
+    Point *res = *resultIterator;
+    if (!isEmpty())
+      this->points.erase(resultIterator);
+
+    return *resultIterator;
+  }
+
+  bool isEmpty() { return points.size() == 1; };
 };
 
 inline __m256 normalizePoint(Point p, Point min, Point max) {
@@ -88,10 +120,11 @@ public:
    * Construction progress:
    *  1) Compute voronoi cells
    *  2) Create Octree - on top of the voronoi cells
-   *      a) take subspace and find how many voronoi cells are intersecting with
-   * this subspace boudingBox) if number of voronoi cells is bigger then `mmax`
-   * split this space by 8 c) Save this subspace to the tree. If the boudingBox)
-   * is true save only the subspace, otherwise save the subspace with point
+   *      a) take subspace and find how many voronoi cells are intersecting
+   * with this subspace boudingBox) if number of voronoi cells is bigger then
+   * `mmax` split this space by 8 c) Save this subspace to the tree. If the
+   * boudingBox) is true save only the subspace, otherwise save the subspace
+   * with point
    *  ....
    * @param p vec of point to be procesed
    * @param min start of the subspace
@@ -135,13 +168,18 @@ public:
   /**
    * Find the closes point to the given point
    * Steps:
-   *  1) find id of voxel in witch is point P
+   *  1) find id of voxel in which is point P
    *  1a)
    *  2) TODO
    * @param p point
    * @return the closes point
    */
   Point &nn(Point &p);
+
+  Point &nnFirstNormal(Point &p, int effort = 0, float tolerance = 0.1);
+
+  Point &nnBestNormalLeaf(Point &p, int effort = 0);
+  nnNormalIterator nnNormalSearch(Point &p, float distance);
 
   std::vector<Point *> knn(Point &p, int k);
 
@@ -178,7 +216,7 @@ public:
     return {box_array[0], box_array[1], box_array[2]};
   }
 
-  inline void printBuildTimes() {
+  inline void printBuildTimes() const {
     auto duration = duration_cast<chrono::nanoseconds>(voroBuild - start);
     cout << "Voronoi finish: " << duration.count() << "ms" << endl;
 
@@ -199,22 +237,4 @@ public:
 
 inline int roundUp8(int x) { return ((x + 7) & (-8)); }
 
-inline float findMinimumOfEight(__m256 data_vec) {
-
-  // Překlápíme horní a dolní čtyři prvky a bereme minimum
-  __m256 permuted = _mm256_permute2f128_ps(data_vec, data_vec, 1);
-  __m256 min_vec = _mm256_min_ps(data_vec, permuted);
-
-  // Bereme minimum mezi prvními a druhými čtyřmi prvky
-  min_vec = _mm256_min_ps(
-      min_vec, _mm256_shuffle_ps(min_vec, min_vec, _MM_SHUFFLE(1, 0, 3, 2)));
-  min_vec = _mm256_min_ps(
-      min_vec, _mm256_shuffle_ps(min_vec, min_vec, _MM_SHUFFLE(2, 3, 0, 1)));
-
-  // Výsledek je v prvním prvku, ostatní prvky jsou irelevantní
-  float result = _mm256_cvtss_f32(
-      min_vec); // Konvertuje první prvek AVX vektoru na skalární float
-
-  return result;
-}
 #endif // BP_HASTREE_H

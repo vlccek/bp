@@ -75,7 +75,7 @@ public:
 
   void getAllNodes(std::set<OctreeNode *> &allNodes);
 
-  inline std::vector<Point *> getPoints(OctreeNode *node) {
+  static inline std::vector<Point *> getPoints(OctreeNode *node) {
     std::vector<Point *> points;
     points.reserve(node->voronoiCells.size());
     for (auto &i : node->voronoiCells) {
@@ -86,7 +86,18 @@ public:
 
   inline OctreeNode *reverseTreeLookup(int reqquiredPoints) {
     OctreeNode *node = this;
-    while (node->voronoiCells.size() < reqquiredPoints * 2) {
+    while (node->voronoiCells.size() < reqquiredPoints ) {
+      if (node->parent == nullptr) {
+        return node;
+      }
+      node = node->parent;
+    }
+    return node;
+  }
+
+  inline OctreeNode *reverseTreeLookupC(int levels) {
+    OctreeNode *node = this;
+    for (; levels > 0; levels--) {
       if (node->parent == nullptr) {
         return node;
       }

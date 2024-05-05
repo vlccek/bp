@@ -32,10 +32,12 @@ HashOctree::HashOctree(std::vector<Point> &p, const Point &min,
     for (cli = con.begin(); cli < con.end(); cli++) {
       if (con.compute_cell(c, cli)) {
         con.pos(cli, x, y, z);
-        Point po(x, y, z);
-        auto poly = Polyhedron(c, po);
 
         int index = cli - con.begin();
+        Point po(p[index]);
+        // Point po(x, y, z, p[index].nor_x, p[index].nor_y, p[index].nor_z);
+        auto poly = Polyhedron(c, po);
+
         voronoiCells[index] = poly;
       }
     }
@@ -152,10 +154,10 @@ Point &HashOctree::findClosesPointInNodeLeaf(Point &p, const OctreeNode *node) {
 
     __m256 distance = _mm256_sqrt_ps(add);
 
+    float tmp[8] __attribute__((aligned(32)));
+    _mm256_store_ps(tmp, distance);
 
     if (voronoicellSize - i < 8) {
-      float tmp[8] __attribute__((aligned(32)));
-      _mm256_store_ps(tmp, distance);
       for (int j = 0; j < voronoicellSize - i; j++) {
         if (tmp[j] < smallestDistance) {
           smallestDistance = tmp[j];
@@ -164,7 +166,12 @@ Point &HashOctree::findClosesPointInNodeLeaf(Point &p, const OctreeNode *node) {
       }
       break;
     } else {
-      findMinimumOfEight(distance);
+      for (int j = 0; j < 8; j++) {
+        if (tmp[j] < smallestDistance) {
+          smallestDistance = tmp[j];
+          closesPoint = &int_voronoicell[i + j]->p;
+        }
+      }
     }
   }
   return *closesPoint;
@@ -231,7 +238,7 @@ std::vector<Point *> HashOctree::knn(Point &p, int k) {
 }
 
 OctreeNode *HashOctree::findClosesNode(Point &p) {
-  int lmin = minLeafLevel; // minimal leaf node level
+  int lmin = 1; // minimal leaf node level
   int lmax = maxLevel;
   int lc;
 
@@ -242,9 +249,8 @@ OctreeNode *HashOctree::findClosesNode(Point &p) {
     idx = findBellogingIntervalsByLevel(p, lc);
     auto pair = std::make_pair(lc, idx);
     auto iterator = this->hashTable.find(pair);
-    if  (iterator != hashTable.end()) { // node does exists
-      [[likely]]
-      lmin = lc;
+    if (iterator != hashTable.end()) { // node does exists
+      [[likely]] lmin = lc;
       // change range to [lc, lmax]
     } else { // node does not exists
       lmax = lc - 1;
@@ -256,8 +262,6 @@ OctreeNode *HashOctree::findClosesNode(Point &p) {
   idx = findBellogingIntervalsByLevel(p, lc);
   auto pair = std::make_pair(lc, idx);
   auto iterator = hashTable.find(pair);
-
-
 
   return iterator->second;
 }
@@ -275,4 +279,91 @@ void HashOctree::createArrayofPoints() {
       i.second->z[j] = i.second->voronoiCells[j]->p.z;
     }
   }
+}
+
+/**
+ * @brief Find first point oriented in the same direction as p or the closes
+ * one. ignoring distance as long as is the same octree node (means
+ * that they're probably close)
+ * @param p
+ * @return Point&
+ */
+Point &HashOctree::nnBestNormalLeaf(Point &p, int effort) {
+  OctreeNode *searchedNode = findClosesNode(p);
+
+  std::vector<Point *> knn = OctreeNode::getPoints(searchedNode);
+
+  float smallest_angel = -1;
+  Point *smallest_angel_point = knn[0];
+  for (auto i : knn) {
+    float angel = dotNorm(*i, p);
+    if (angel > smallest_angel) {
+      smallest_angel = angel;
+      smallest_angel_point = i;
+      if (angel == 1) [[unlikely]]
+        break;
+    }
+  }
+  return *smallest_angel_point;
+}
+
+/**
+ * @brief Aproximation of the NN search with normal comprasion.
+ * It will search only points in set node return first point with angel bigger
+ * than (1 - tolerance)
+ * @param p Point
+ * @param effort if 0 the search is made in leaf node.
+ * If 1 it will search in the parent of leaf node. And so on ...
+ * @param tolerance if the angel between the point and the closes point is
+ * bigger than 1 - tolerance it will stop searching.
+ * @return Point&
+ */
+Point &HashOctree::nnFirstNormal(Point &p, int effort, float tolerance) {
+  OctreeNode *searchedNode = findClosesNode(p);
+
+  searchedNode = searchedNode->reverseTreeLookupC(effort);
+
+  auto distanceFunction = [&p](Point *a, Point *b) {
+    return a->distance(p) < b->distance(p);
+  };
+
+  std::vector<Point *> knn = OctreeNode::getPoints(searchedNode);
+
+  std::sort(knn.begin(), knn.end(), distanceFunction);
+
+  float smallest_angel = -1;
+  Point *smallest_angel_point = knn[0];
+  for (auto i : knn) {
+    float angel = dotNorm(*i, p);
+    if (angel > smallest_angel) {
+      smallest_angel = angel;
+      smallest_angel_point = i;
+      if (angel > 1 - tolerance) [[unlikely]]
+        break;
+    }
+  }
+  return *smallest_angel_point;
+}
+
+/**
+ *
+ * @param p
+ * @param tolerance
+ * @return
+ */
+nnNormalIterator HashOctree::nnNormalSearch(Point &p, float distance) {
+  OctreeNode *searchedNode = findClosesNode(p);
+
+  auto w = -this->min + this->max;
+
+  float wmax = std::max(w.x, std::max(w.y, w.z));
+
+  int level = static_cast<int>(std::ceil((std::log2(((wmax / distance)))))) -
+              (searchedNode->level);
+
+  searchedNode = searchedNode->reverseTreeLookupC(level);
+
+  std::vector<Point *> points = searchedNode->getPoints(searchedNode);
+
+  return nnNormalIterator{points, p};
 }

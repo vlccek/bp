@@ -64,11 +64,24 @@ int main() {
       //"10m"
   };
 
+  auto mmax_range = {8, 16, 32, 64, 96, 128, 256};
+
+#ifndef FROM_acc
+#define FROM_acc 0
+#endif
+
+#ifndef TO_acc
+#define TO_acc 50
+#endif
+
+
+  // auto mmax_range = {128, 256};
+
 #if NNTEST
-  for ( auto& test_number : {8, 16, 32, 64, 96}) {
+  for (std::weakly_incrementable auto test_number : std::views::iota(FROM_acc, TO_acc)) {
     for (auto &testcase : testCases) {
 
-      for (int m_max = 5; m_max <= 30; m_max += 5) {
+      for (auto &m_max : mmax_range) {
         if (testcase == "10m" && m_max == 5) {
           continue;
         }
@@ -83,8 +96,6 @@ int main() {
             insetedPoints.data());
 
         HashOctree tree(insetedPoints, from, to, omp_get_max_threads(), m_max);
-
-        // knn_test(testedPoints, knn, tree);
 
         int err_case = 0;
         int all_case = testedPoints.size();
@@ -126,11 +137,14 @@ int main() {
     }
   }
 #else
-  std::cout
-      << "name tested_point_number test_number kn_size m_max accuracy avg_err err_case_float\n";
-  for ( auto& test_number : {8, 16, 32, 64, 96}) {
+  std::cout << "name tested_point_number test_number kn_size m_max accuracy "
+               "avg_err err_case_float\n";
+
+
+
+  for (std::weakly_incrementable auto test_number : std::views::iota(FROM_acc, TO_acc)) {
     for (auto &testcase : testCases) {
-      for (int m_max = 5; m_max <= 30; m_max += 5) {
+      for (auto &m_max : mmax_range) {
 
         int err_case = 0;
         int err_case_float = 0;
@@ -143,34 +157,37 @@ int main() {
             std::format("points_{}_{}.txt", testcase, test_number));
         auto testedPoints = loadPointsFromFile(
             std::format("points_{}_{}_tested.txt", testcase, test_number));
-        auto knn = loadPointsFromFilePointer(
+        auto knns = loadPointsFromFilePointer(
             std::format("points_{}_{}_computed_neigbors.txt", testcase,
                         test_number),
             insetedPoints.data());
 
         HashOctree tree(insetedPoints, from, to, omp_get_max_threads(), m_max);
 
-        for (int kn_size = 5; kn_size <= 100; kn_size += 5) {
+        for (int kn_size : {8, 16, 32, 64, 96, 128, 256, 512, 1000}) {
           // test
           for (int l = 0; l < testedPoints.size(); l++) {
             auto a = tree.knn(testedPoints[l], kn_size);
             // a.resize(kn_size);
-            vector<Point *> b = knn[l];
+            vector<Point *> knn = knns[l];
+            if (knn.size() < kn_size) {
+              continue;
+            }
             for (int i = 0; i < kn_size; i++) {
-              if (*a[i] != *b[i])
+              if (*a[i] != *knn[i])
                 err_case_float++;
-              if (testedPoints[l].distance(*b[i]) !=
+              if (testedPoints[l].distance(*knn[i]) !=
                   testedPoints[l].distance(*a[i])) {
                 err_case++;
 
                 err_sum += std::abs(distance(testedPoints[l], *a[i]) -
-                                    distance(testedPoints[l], (*b[i])));
+                                    distance(testedPoints[l], (*knn[i])));
               }
             }
 
             std::cout << std::format(
                              "{} {} {} {} {} {} {} {}",
-                             testcase,                       // test case
+                             testcase, // test case
                              l,
                              test_number,                    // test number
                              kn_size,                        // kn size

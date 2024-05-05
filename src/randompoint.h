@@ -16,6 +16,11 @@ public:
   explicit RandomPoint(float (*random)());
 };
 
+class RandomPointNormal : public Point {
+public:
+  explicit RandomPointNormal(float (*random)());
+};
+
 template <float FROM, float TO> static float genNumber() {
   static std::default_random_engine e1(1);
   static std::uniform_real_distribution<float> uniform_dist(FROM, TO);
@@ -32,22 +37,31 @@ template <float FROM, float TO> static float genNumber_cluster() {
   return static_cast<float>(d(gen));
 }
 
-template <float FROM, float TO> static std::vector<Point> genPoints(int pCount) {
+template <float FROM, float TO>
+static std::vector<Point> genPoints(int pCount) {
   std::vector<Point> points;
   for (int i = 0; i < pCount; i++) {
     points.push_back(RandomPoint(&genNumber<FROM, TO>));
   }
   return points;
 }
+template <float FROM, float TO>
+static std::vector<Point> genPointsWithNormal(int pCount) {
+  std::vector<Point> points;
+  for (int i = 0; i < pCount; i++) {
+    points.push_back(RandomPointNormal(&genNumber<FROM, TO>));
+  }
+  return points;
+}
 
-template <float FROM, float TO> static std::vector<Point> genPointsCluster(int pCount) {
+template <float FROM, float TO>
+static std::vector<Point> genPointsCluster(int pCount) {
   std::vector<Point> points;
   for (int i = 0; i < pCount; i++) {
     points.push_back(RandomPoint(&genNumber_cluster<FROM, TO>));
   }
   return points;
 }
-
 
 template <int FROM, int TO> static float genNumber() {
   static std::default_random_engine e1(1);
@@ -73,13 +87,13 @@ template <int FROM, int TO> static std::vector<Point> genPoints(int pCount) {
   return points;
 }
 
-template <int FROM, int TO> static std::vector<Point> genPointsCluster(int pCount) {
+template <int FROM, int TO>
+static std::vector<Point> genPointsCluster(int pCount) {
   std::vector<Point> points;
   for (int i = 0; i < pCount; i++) {
     points.push_back(RandomPoint(&genNumber_cluster<FROM, TO>));
   }
   return points;
 }
-
 
 #endif // BP_RANDOMPOINT_H
