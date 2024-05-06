@@ -1,6 +1,8 @@
-//
-// Created by jvlk on 18.10.23.
-//
+/**
+ * @file box.cpp
+ * @brief Box class
+ * @author Jakub Vlk
+ */
 
 #include "box.h"
 #include <iostream>

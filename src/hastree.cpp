@@ -1,6 +1,9 @@
-//
-// Created by jvlk on 27.9.23.
-//
+/**
+ * @file hastree.cpp
+ * @brief Implementation of HashOctree class
+
+ */
+
 
 #include "hastree.h"
 

@@ -1,6 +1,8 @@
-//
-// Created by jvlk on 27.9.23.
-//
+/**
+* @file randompoint.h
+* @brief RandomPoint class
+* @author Jakub Vlk
+ */
 
 #include "point.h"
 #include <random>

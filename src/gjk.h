@@ -1,8 +1,9 @@
 /**
- * Module for computing if box and Polyhedron are intersecting by gjk algorithm
- * Create by Jakub Vlk
- * Heavily inspired by https://winter.dev/articles/gjk-algorithm
- */
+* @file gjk.h
+* @brief Implementation of the GJK algorithm, inspired by https://winter.dev/articles/gjk-algorithm
+* @author Jakub Vlk
+
+*/
 
 #ifndef BP_GJK_H
 #define BP_GJK_H

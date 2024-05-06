@@ -1,6 +1,8 @@
-//
-// Created by jvlk on 18.10.23.
-//
+/**
+* @file OctreeNode.h
+* @brief Octree Node class
+* @author Jakub Vlk
+ */
 
 #ifndef BP_OCTRERNODEBUILDER_H
 #define BP_OCTRERNODEBUILDER_H

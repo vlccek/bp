@@ -1,6 +1,9 @@
-//
-// Created by jvlk on 27.9.23.
-//
+/**
+* @file polyhedron.h
+* @brief Polyhedron class
+* @author Jakub Vlk
+ */
+
 #include <vector>
 #include <format>
 #include <string>
@@ -12,7 +15,6 @@
 #ifndef BP_VORONOI_H
 #define BP_VORONOI_H
 
-// todo rename this class/file to "mnogostěn"
 class Polyhedron {
 public:
     Point p;

@@ -1,6 +1,9 @@
-//
-// Created by jvlk on 27.9.23.
-//
+/**
+* @file hastree.h
+* @brief Implementation of HashOctree class
+
+*/
+
 
 #ifndef BP_HASTREE_H
 #define BP_HASTREE_H

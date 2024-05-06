@@ -1,11 +1,20 @@
-//
-// Created by jvlk on 18.10.23.
-//
+/**
+* @file OctreeNode.cpp
+* @brief Octree Node class
+* @author Jakub Vlk
+*/
 
 #include "OctreeNode.h"
 
 #define ONLY_GJK 0
 
+/**
+ * @brief Construct a new Octree Node:: Octree Node object. Builds whole tree
+ * @param level
+ * @param maxLevel
+ * @param maxPointsIncell
+ * @param parent
+ */
 OctreeNode::OctreeNode(int level, int *maxLevel, const int maxPointsIncell,
                        OctreeNode *parent)
     : maxPointsInNode(maxPointsIncell) {
@@ -18,6 +27,11 @@ OctreeNode::OctreeNode(int level, int *maxLevel, const int maxPointsIncell,
   }
 }
 
+/**
+ * @brief Test if the child at given index exists. If not, allocate it.
+ * @param index
+ * @param b
+ */
 void OctreeNode::allocateIfNeccesary(int index, Box &b) {
   if (childs[index] == nullptr) {
     childCount++;
@@ -26,6 +40,10 @@ void OctreeNode::allocateIfNeccesary(int index, Box &b) {
   }
 }
 
+/**
+ * @brief get all leafs of the tree
+ * @param leafs
+ */
 void OctreeNode::getLeafs(std::vector<OctreeNode *> &leafs) {
   for (auto &child : childs) {
     if (child != nullptr) {
@@ -39,7 +57,10 @@ void OctreeNode::getLeafs(std::vector<OctreeNode *> &leafs) {
   }
 }
 
-
+/**
+ *
+ * @param file
+ */
 void OctreeNode::printVoronoiCells(std::ofstream &file) {
   for (auto &vc : voronoiCells) {
     // file << vc->p.operator std::string() << std::endl;
@@ -50,6 +71,11 @@ void OctreeNode::printVoronoiCells(std::ofstream &file) {
   }
 }
 
+/**
+ * @brief Get the All Nodes object
+ *
+ * @param allNodes
+ */
 void OctreeNode::getAllNodes(std::set<OctreeNode *> &allNodes) {
 #pragma omp parallel
   {

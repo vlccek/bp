@@ -1,4 +1,9 @@
+/**
+ * @file gjk.cpp
+ * @brief Implementation of the GJK algorithm, inspired by https://winter.dev/articles/gjk-algorithm
+ * @author Jakub Vlk
 
+ */
 
 #include "gjk.h"
 

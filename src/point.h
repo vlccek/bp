@@ -1,3 +1,10 @@
+/**
+* @file point.h
+* @brief Point class
+* @author Jakub Vlk
+ */
+
+
 #include <cmath>
 #include <iostream>
 #include <string>

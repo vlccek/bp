@@ -1,3 +1,9 @@
+/**
+ * @file main.cpp
+ * @brief Main file for testing the HashOctree
+ * @author Jakub Vlk
+ */
+
 #include "point.h"
 #include "randompoint.h"
 #include <ranges>

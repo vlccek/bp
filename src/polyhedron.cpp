@@ -1,6 +1,9 @@
-//
-// Created by jvlk on 27.9.23.
-//
+/**
+* @file polyhedron.cpp
+* @brief Polyhedron class
+* @author Jakub Vlk
+ */
+
 
 #include "polyhedron.h"
 #include "point.h"
