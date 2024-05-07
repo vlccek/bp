@@ -4,7 +4,6 @@
 
  */
 
-
 #include "hastree.h"
 
 // #define TREE_PRINT_BUILDTIME
@@ -293,6 +292,8 @@ void HashOctree::createArrayofPoints() {
  */
 Point &HashOctree::nnBestNormalLeaf(Point &p, int effort) {
   OctreeNode *searchedNode = findClosesNode(p);
+
+  searchedNode = searchedNode->reverseTreeLookupC(effort);
 
   std::vector<Point *> knn = OctreeNode::getPoints(searchedNode);
 
