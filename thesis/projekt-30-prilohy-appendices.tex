@@ -1,0 +1,47 @@
+% Tento soubor nahraďte vlastním souborem s přílohami (nadpisy níže jsou pouze pro příklad)
+
+% Pro kompilaci po částech (viz projekt.tex), nutno odkomentovat a upravit
+%\documentclass[../projekt.tex]{subfiles}
+%\begin{document}
+
+% Umístění obsahu paměťového média do příloh je vhodné konzultovat s vedoucím
+\chapter{Obsah přiloženého paměťového média}
+Na přiloženém paměťovém mediu se nachází kompletní projekt připravený k~překladu. Na mediu se také nachází externí závislosti ve verzích, které byly použity (Google Benchmark, Google Test, Voro++). Jedinou externí závislostí, kterou je potřeba mít nainstalovanou, je OPENMP ve verzi alespoň 4.5.
+
+Na přiloženém mediu se nachází:
+\begin{description}
+\item [složka src] Obsahuje všechny soubory nezbytné pro funkci knihovny, včetně hlavičkových a zdrojových souborů.
+\item [složka benchmark] Obsahuje benchmarky, které byly použity pro testování výkonu.
+\item [složka accuracy\_test] Obsahuje zdrojové soubory pro testování přesnosti a generování souborů, které obsahují nejbližší sousedy získané hrubou silou. Testy v~této složce byly napsány co možná nejvíc přímočaře, aby se vyloučily chyby.
+\item [složka test] Obsahuje testy některých komponent, u~kterých byly během implementace pochybnosti o~funkčnosti.
+\item [složka picture] Obsahuje skripty, které byly použity pro generování většiny obrázků pro text práce.
+\item [složka deps] Obsahuje externí závislosti.
+\item [CMakeLists.txt] Hlavní CMake soubor celého projektu, umístěný přímo v~kořenovém adresáři.
+\item [Dockerfile] Dockerfile pro jednoduché spuštění projektu na různých systémech, bez ohledu na nainstalované knihovny.
+\item [readme.md] Návod na kompilaci a seznam závislostí.
+\item [složka docs] zdrojové soubory latexu pro vygenerování tohoto souboru.
+
+\end{description}
+
+
+\chapter{Manuál}
+Pro použití projektu jako knihovny lze přidat složku s~kódem do projektu s~pomocí Cmake jako závislost. Poté bude dostupná statická knihovna pod názvem \emph{hashoctree}. CMake je nakonfigurován tak, aby s~\emph{CMAKE\_BUILD\_TYPE=Release} vytvořil co nejvíc optimalizovaný program. Překlad byl testován na systémech Linux (Arch, Ubuntu, Gentoo); na Windows nebyl testován.
+
+Pro používání knihovny je potřeba integrovat hlavičkový soubor \emph{hashoctree.h}. Poté je možné vytvořit objekt třídy \emph{octreehash}, který realizuje budování celé struktury. Konstruktor potřebuje k~vystavění stromu body a hranice prostoru. Volitelnými parametry je počet vláken a kriterium $M_{max}$.
+
+Pro jednoduché otestování stačí vložit požadovaný kód využívající tuto knihovnu do souboru \emph{src/main.cpp} a přeložit cíl s~názve \emph{main}, což lze například pomocí\footnote{Pro překladat optimalizované verze je nutné použít nastavení proměnné CMAKE\_BUILD\_TYPE=Release.}:
+\begin{enumerate}
+    \item mkdir build
+    \item cd build
+    \item cmake ..
+    \item make main
+\end{enumerate}
+
+Pro překlad projektu je nezbytné, aby byl prováděn překladačem podporujícím C++20. Projekt využívá implementaci formátování řetězců ze standardní knihovny, což v~praxi znamená, že je potřeba použít alespoň GCC 13 s~příslušnou verzí standardní knihovny nebo Clang 17 a vyšší. Pro funkčnost knihovny je nezbytná podpora AVX2. Vzhledem k~povaze této práce nejsou dodávány binární spustitelné
+soubory. 
+
+%\chapter{Konfigurační soubor}
+
+%\chapter{RelaxNG Schéma konfiguračního souboru}
+
+%\chapter{Plakát}
