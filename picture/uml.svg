@@ -1,0 +1,891 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   contentStyleType="text/css"
+   height="917px"
+   preserveAspectRatio="none"
+   style="width:1120px;height:917px;background:#FFFFFF;"
+   version="1.1"
+   viewBox="0 0 1120 917"
+   width="1120px"
+   zoomAndPan="magnify"
+   id="svg52"
+   sodipodi:docname="uml.svg"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview52"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.64609129"
+     inkscape:cx="272.40733"
+     inkscape:cy="60.362987"
+     inkscape:window-width="1663"
+     inkscape:window-height="932"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="elem_HashOctree" />
+  <defs
+     id="defs1" />
+  <g
+     id="g52">
+    <!--class BoudingBox-->
+    <g
+       id="elem_BoudingBox" />
+    <!--class Box-->
+    <g
+       id="elem_Box">
+      <rect
+         codeLine="8"
+         fill="#F1F1F1"
+         height="96.8906"
+         id="Box"
+         rx="2.5"
+         ry="2.5"
+         style="stroke:#181818;stroke-width:0.5;"
+         width="224"
+         x="300"
+         y="491.9" />
+      <ellipse
+         cx="394.75"
+         cy="507.9"
+         fill="#ADD1B2"
+         rx="11"
+         ry="11"
+         style="stroke:#181818;stroke-width:1.0;"
+         id="ellipse2" />
+      <path
+         d="M397.7188,513.5406 Q397.1406,513.8375 396.5,513.9781 Q395.8594,514.1344 395.1563,514.1344 Q392.6563,514.1344 391.3281,512.4938 Q390.0156,510.8375 390.0156,507.7125 Q390.0156,504.5875 391.3281,502.9313 Q392.6563,501.275 395.1563,501.275 Q395.8594,501.275 396.5,501.4313 Q397.1563,501.5875 397.7188,501.8844 L397.7188,504.6031 Q397.0938,504.025 396.5,503.7594 Q395.9063,503.4781 395.2813,503.4781 Q393.9375,503.4781 393.25,504.5563 Q392.5625,505.6188 392.5625,507.7125 Q392.5625,509.8063 393.25,510.8844 Q393.9375,511.9469 395.2813,511.9469 Q395.9063,511.9469 396.5,511.6813 Q397.0938,511.4 397.7188,510.8219 L397.7188,513.5406 Z "
+         fill="#000000"
+         id="path2" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14"
+         lengthAdjust="spacing"
+         textLength="26"
+         x="415.25"
+         y="512.7467"
+         id="text2">Box</text>
+      <line
+         style="stroke:#181818;stroke-width:0.5;"
+         x1="301"
+         x2="523"
+         y1="523.9"
+         y2="523.9"
+         id="line3" />
+      <ellipse
+         cx="311"
+         cy="537.5484"
+         fill="none"
+         rx="3"
+         ry="3"
+         style="stroke:#038048;stroke-width:1.0;"
+         id="ellipse3" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14"
+         lengthAdjust="spacing"
+         textLength="76"
+         x="320"
+         y="540.8951"
+         id="text3">max : Point</text>
+      <ellipse
+         cx="311"
+         cy="553.8453"
+         fill="none"
+         rx="3"
+         ry="3"
+         style="stroke:#038048;stroke-width:1.0;"
+         id="ellipse4" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14"
+         lengthAdjust="spacing"
+         textLength="73"
+         x="320"
+         y="557.192"
+         id="text4">min : Point</text>
+      <ellipse
+         cx="311"
+         cy="570.1422"
+         fill="none"
+         rx="3"
+         ry="3"
+         style="stroke:#038048;stroke-width:1.0;"
+         id="ellipse5" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14"
+         lengthAdjust="spacing"
+         textLength="198"
+         x="320"
+         y="573.4889"
+         id="text5">splited : std::array&lt;Box, 8&gt;*</text>
+    </g>
+    <!--class HashOctree-->
+    <g
+       id="elem_HashOctree">
+      <rect
+         codeLine="15"
+         fill="#f1f1f1"
+         height="155.05768"
+         id="HashOctree"
+         rx="2.5"
+         ry="2.5"
+         style="stroke:#181818;stroke-width:0.5"
+         width="300"
+         x="213"
+         y="46.614231" />
+      <circle
+         cx="317.75"
+         cy="63"
+         fill="#add1b2"
+         style="stroke:#181818;stroke-width:1"
+         id="ellipse6"
+         r="11" />
+      <path
+         d="m 320.7188,68.6406 q -0.5782,0.2969 -1.2188,0.4375 -0.6406,0.1563 -1.3437,0.1563 -2.5,0 -3.8282,-1.6406 -1.3125,-1.6563 -1.3125,-4.7813 0,-3.125 1.3125,-4.7812 1.3282,-1.6563 3.8282,-1.6563 0.7031,0 1.3437,0.1563 0.6563,0.1562 1.2188,0.4531 v 2.7187 q -0.625,-0.5781 -1.2188,-0.8437 -0.5937,-0.2813 -1.2187,-0.2813 -1.3438,0 -2.0313,1.0782 -0.6875,1.0625 -0.6875,3.1562 0,2.0938 0.6875,3.1719 0.6875,1.0625 2.0313,1.0625 0.625,0 1.2187,-0.2656 0.5938,-0.2813 1.2188,-0.8594 z"
+         fill="#000000"
+         id="path6" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14px"
+         lengthAdjust="spacing"
+         textLength="82"
+         x="338.25"
+         y="27.846701"
+         id="text6"
+         transform="translate(0,40)">HashOctree</text>
+      <line
+         style="stroke:#181818;stroke-width:0.5"
+         x1="214"
+         x2="512"
+         y1="79"
+         y2="79"
+         id="line6" />
+      <rect
+         fill="none"
+         height="6"
+         style="stroke:#c82930;stroke-width:1"
+         width="6"
+         x="221"
+         y="89.648399"
+         id="rect6" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14px"
+         lengthAdjust="spacing"
+         textLength="132"
+         x="233"
+         y="55.995098"
+         id="text7"
+         transform="translate(0,40)">root : OctreeNode*</text>
+      <circle
+         cx="224"
+         cy="108.9453"
+         fill="none"
+         style="stroke:#038048;stroke-width:1"
+         id="ellipse7"
+         r="3" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14px"
+         lengthAdjust="spacing"
+         textLength="76"
+         x="233"
+         y="72.292"
+         id="text8"
+         transform="translate(0,40)">max : Point</text>
+      <circle
+         cx="224"
+         cy="125.2422"
+         fill="none"
+         style="stroke:#038048;stroke-width:1"
+         id="ellipse8"
+         r="3" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14px"
+         lengthAdjust="spacing"
+         textLength="73"
+         x="233"
+         y="88.588898"
+         id="text9"
+         transform="translate(0,40)">min : Point</text>
+      <circle
+         cx="224"
+         cy="141.53909"
+         fill="none"
+         style="stroke:#038048;stroke-width:1"
+         id="ellipse9"
+         r="3" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14px"
+         lengthAdjust="spacing"
+         textLength="193"
+         x="233"
+         y="104.8857"
+         id="text10"
+         transform="translate(0,40)">maxPointsInNode : const int</text>
+      <rect
+         fill="none"
+         height="6"
+         style="stroke:#c82930;stroke-width:1"
+         width="6"
+         x="221"
+         y="154.83591"
+         id="rect10" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14px"
+         lengthAdjust="spacing"
+         textLength="93"
+         x="233"
+         y="121.1826"
+         id="text11"
+         transform="translate(0,40)">maxLevel : int</text>
+      <rect
+         fill="none"
+         height="6"
+         style="stroke:#c82930;stroke-width:1"
+         width="6"
+         x="221"
+         y="171.4297"
+         id="rect12" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14px"
+         lengthAdjust="spacing"
+         textLength="130"
+         x="233"
+         y="153.7764"
+         id="text13"
+         transform="translate(0,24)">pointCount : size_t</text>
+      <rect
+         fill="none"
+         height="6"
+         style="stroke:#c82930;stroke-width:1"
+         width="6"
+         x="221"
+         y="187.72659"
+         id="rect13" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14px"
+         lengthAdjust="spacing"
+         textLength="274"
+         x="233"
+         y="170.0732"
+         id="text14"
+         transform="translate(0,24)">voronoiCells : std::vector&lt;Polyhedron&gt;</text>
+    </g>
+    <!--class OctreeNode-->
+    <g
+       id="elem_OctreeNode">
+      <rect
+         codeLine="28"
+         fill="#F1F1F1"
+         height="162.0781"
+         id="OctreeNode"
+         rx="2.5"
+         ry="2.5"
+         style="stroke:#181818;stroke-width:0.5;"
+         width="307"
+         x="209.5"
+         y="261.67" />
+      <ellipse
+         cx="316.75"
+         cy="277.67"
+         fill="#ADD1B2"
+         style="stroke:#181818;stroke-width:1.0;"
+         id="ellipse15"
+         ry="11"
+         rx="11" />
+      <path
+         d="M319.7188,283.3106 Q319.1406,283.6075 318.5,283.7481 Q317.8594,283.9044 317.1563,283.9044 Q314.6563,283.9044 313.3281,282.2638 Q312.0156,280.6075 312.0156,277.4825 Q312.0156,274.3575 313.3281,272.7013 Q314.6563,271.045 317.1563,271.045 Q317.8594,271.045 318.5,271.2013 Q319.1563,271.3575 319.7188,271.6544 L319.7188,274.3731 Q319.0938,273.795 318.5,273.5294 Q317.9063,273.2481 317.2813,273.2481 Q315.9375,273.2481 315.25,274.3263 Q314.5625,275.3888 314.5625,277.4825 Q314.5625,279.5763 315.25,280.6544 Q315.9375,281.7169 317.2813,281.7169 Q317.9063,281.7169 318.5,281.4513 Q319.0938,281.17 319.7188,280.5919 L319.7188,283.3106 Z "
+         fill="#000000"
+         id="path15" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14"
+         lengthAdjust="spacing"
+         textLength="84"
+         x="337.25"
+         y="282.5167"
+         id="text16">OctreeNode</text>
+      <line
+         style="stroke:#181818;stroke-width:0.5;"
+         x1="210.5"
+         x2="515.5"
+         y1="293.67"
+         y2="293.67"
+         id="line16" />
+      <ellipse
+         cx="220.5"
+         cy="307.3184"
+         fill="none"
+         style="stroke:#038048;stroke-width:1.0;"
+         id="ellipse16"
+         ry="3"
+         rx="3" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14"
+         lengthAdjust="spacing"
+         textLength="85"
+         x="229.5"
+         y="310.6651"
+         id="text17">border : Box</text>
+      <ellipse
+         cx="220.5"
+         cy="323.6153"
+         fill="none"
+         style="stroke:#038048;stroke-width:1.0;"
+         id="ellipse17"
+         ry="3"
+         rx="3" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14"
+         lengthAdjust="spacing"
+         textLength="149"
+         x="229.5"
+         y="326.962"
+         id="text18">parent : OctreeNode*</text>
+      <ellipse
+         cx="220.5"
+         cy="339.9122"
+         fill="none"
+         style="stroke:#038048;stroke-width:1.0;"
+         id="ellipse18"
+         ry="3"
+         rx="3" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14"
+         lengthAdjust="spacing"
+         textLength="193"
+         x="229.5"
+         y="343.2589"
+         id="text19">maxPointsInNode : const int</text>
+      <ellipse
+         cx="220.5"
+         cy="356.2091"
+         fill="none"
+         style="stroke:#038048;stroke-width:1.0;"
+         id="ellipse19"
+         ry="3"
+         rx="3" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14"
+         lengthAdjust="spacing"
+         textLength="104"
+         x="229.5"
+         y="359.5557"
+         id="text20">childCount : int</text>
+      <ellipse
+         cx="220.5"
+         cy="372.5059"
+         fill="none"
+         style="stroke:#038048;stroke-width:1.0;"
+         id="ellipse20"
+         ry="3"
+         rx="3" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14"
+         lengthAdjust="spacing"
+         textLength="61"
+         x="229.5"
+         y="375.8526"
+         id="text21">level : int</text>
+      <ellipse
+         cx="220.5"
+         cy="388.8028"
+         fill="none"
+         style="stroke:#038048;stroke-width:1.0;"
+         id="ellipse21"
+         ry="3"
+         rx="3" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14"
+         lengthAdjust="spacing"
+         textLength="100"
+         x="229.5"
+         y="392.1495"
+         id="text22">maxLevel : int*</text>
+      <ellipse
+         cx="220.5"
+         cy="405.0997"
+         fill="none"
+         style="stroke:#038048;stroke-width:1.0;"
+         id="ellipse22"
+         ry="3"
+         rx="3" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14"
+         lengthAdjust="spacing"
+         textLength="281"
+         x="229.5"
+         y="408.4464"
+         id="text23">voronoiCells : std::vector&lt;Polyhedron*&gt;</text>
+    </g>
+    <!--class Point-->
+    <g
+       id="elem_Point">
+      <rect
+         codeLine="39"
+         fill="#F1F1F1"
+         height="145.7813"
+         id="Point"
+         rx="2.5"
+         ry="2.5"
+         style="stroke:#181818;stroke-width:0.5;"
+         width="106"
+         x="359"
+         y="656.94" />
+      <ellipse
+         cx="391.55"
+         cy="672.94"
+         fill="#ADD1B2"
+         rx="11"
+         ry="11"
+         style="stroke:#181818;stroke-width:1.0;"
+         id="ellipse23" />
+      <path
+         d="M394.5188,678.5806 Q393.9406,678.8775 393.3,679.0181 Q392.6594,679.1744 391.9563,679.1744 Q389.4563,679.1744 388.1281,677.5338 Q386.8156,675.8775 386.8156,672.7525 Q386.8156,669.6275 388.1281,667.9713 Q389.4563,666.315 391.9563,666.315 Q392.6594,666.315 393.3,666.4713 Q393.9563,666.6275 394.5188,666.9244 L394.5188,669.6431 Q393.8938,669.065 393.3,668.7994 Q392.7063,668.5181 392.0813,668.5181 Q390.7375,668.5181 390.05,669.5963 Q389.3625,670.6588 389.3625,672.7525 Q389.3625,674.8463 390.05,675.9244 Q390.7375,676.9869 392.0813,676.9869 Q392.7063,676.9869 393.3,676.7213 Q393.8938,676.44 394.5188,675.8619 L394.5188,678.5806 Z "
+         fill="#000000"
+         id="path23" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14"
+         lengthAdjust="spacing"
+         textLength="35"
+         x="409.45"
+         y="677.7867"
+         id="text24">Point</text>
+      <line
+         style="stroke:#181818;stroke-width:0.5;"
+         x1="360"
+         x2="464"
+         y1="688.94"
+         y2="688.94"
+         id="line24" />
+      <ellipse
+         cx="370"
+         cy="702.5884"
+         fill="none"
+         rx="3"
+         ry="3"
+         style="stroke:#038048;stroke-width:1.0;"
+         id="ellipse24" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14"
+         lengthAdjust="spacing"
+         textLength="79"
+         x="379"
+         y="705.9351"
+         id="text25">nor_x : float</text>
+      <ellipse
+         cx="370"
+         cy="718.8853"
+         fill="none"
+         rx="3"
+         ry="3"
+         style="stroke:#038048;stroke-width:1.0;"
+         id="ellipse25" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14"
+         lengthAdjust="spacing"
+         textLength="79"
+         x="379"
+         y="722.232"
+         id="text26">nor_y : float</text>
+      <ellipse
+         cx="370"
+         cy="735.1822"
+         fill="none"
+         rx="3"
+         ry="3"
+         style="stroke:#038048;stroke-width:1.0;"
+         id="ellipse26" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14"
+         lengthAdjust="spacing"
+         textLength="80"
+         x="379"
+         y="738.5289"
+         id="text27">nor_z : float</text>
+      <ellipse
+         cx="370"
+         cy="751.4791"
+         fill="none"
+         rx="3"
+         ry="3"
+         style="stroke:#038048;stroke-width:1.0;"
+         id="ellipse27" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14"
+         lengthAdjust="spacing"
+         textLength="49"
+         x="379"
+         y="754.8257"
+         id="text28">x : float</text>
+      <ellipse
+         cx="370"
+         cy="767.7759"
+         fill="none"
+         rx="3"
+         ry="3"
+         style="stroke:#038048;stroke-width:1.0;"
+         id="ellipse28" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14"
+         lengthAdjust="spacing"
+         textLength="49"
+         x="379"
+         y="771.1226"
+         id="text29">y : float</text>
+      <ellipse
+         cx="370"
+         cy="784.0728"
+         fill="none"
+         rx="3"
+         ry="3"
+         style="stroke:#038048;stroke-width:1.0;"
+         id="ellipse29" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14"
+         lengthAdjust="spacing"
+         textLength="50"
+         x="379"
+         y="787.4195"
+         id="text30">z : float</text>
+    </g>
+    <!--class Polyhedron-->
+    <g
+       id="elem_Polyhedron">
+      <rect
+         codeLine="49"
+         fill="#F1F1F1"
+         height="113.1875"
+         id="Polyhedron"
+         rx="2.5"
+         ry="2.5"
+         style="stroke:#181818;stroke-width:0.5;"
+         width="258"
+         x="7"
+         y="483.75" />
+      <ellipse
+         cx="92.75"
+         cy="499.75"
+         fill="#ADD1B2"
+         rx="11"
+         ry="11"
+         style="stroke:#181818;stroke-width:1.0;"
+         id="ellipse30" />
+      <path
+         d="M95.7188,505.3906 Q95.1406,505.6875 94.5,505.8281 Q93.8594,505.9844 93.1563,505.9844 Q90.6563,505.9844 89.3281,504.3438 Q88.0156,502.6875 88.0156,499.5625 Q88.0156,496.4375 89.3281,494.7813 Q90.6563,493.125 93.1563,493.125 Q93.8594,493.125 94.5,493.2813 Q95.1563,493.4375 95.7188,493.7344 L95.7188,496.4531 Q95.0938,495.875 94.5,495.6094 Q93.9063,495.3281 93.2813,495.3281 Q91.9375,495.3281 91.25,496.4063 Q90.5625,497.4688 90.5625,499.5625 Q90.5625,501.6563 91.25,502.7344 Q91.9375,503.7969 93.2813,503.7969 Q93.9063,503.7969 94.5,503.5313 Q95.0938,503.25 95.7188,502.6719 L95.7188,505.3906 Z "
+         fill="#000000"
+         id="path30" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14"
+         lengthAdjust="spacing"
+         textLength="78"
+         x="113.25"
+         y="504.5967"
+         id="text31">Polyhedron</text>
+      <line
+         style="stroke:#181818;stroke-width:0.5;"
+         x1="8"
+         x2="264"
+         y1="515.75"
+         y2="515.75"
+         id="line31" />
+      <ellipse
+         cx="18"
+         cy="529.3984"
+         fill="none"
+         rx="3"
+         ry="3"
+         style="stroke:#038048;stroke-width:1.0;"
+         id="ellipse31" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14"
+         lengthAdjust="spacing"
+         textLength="180"
+         x="27"
+         y="532.7451"
+         id="text32">boudingBox : BoudingBox</text>
+      <ellipse
+         cx="18"
+         cy="545.6953"
+         fill="none"
+         rx="3"
+         ry="3"
+         style="stroke:#038048;stroke-width:1.0;"
+         id="ellipse32" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14"
+         lengthAdjust="spacing"
+         textLength="57"
+         x="27"
+         y="549.042"
+         id="text33">p : Point</text>
+      <ellipse
+         cx="18"
+         cy="561.9922"
+         fill="none"
+         rx="3"
+         ry="3"
+         style="stroke:#038048;stroke-width:1.0;"
+         id="ellipse33" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14"
+         lengthAdjust="spacing"
+         textLength="232"
+         x="27"
+         y="565.3389"
+         id="text34">vertexPoints : std::vector&lt;Point&gt;</text>
+      <ellipse
+         cx="18"
+         cy="578.2891"
+         fill="none"
+         rx="3"
+         ry="3"
+         style="stroke:#038048;stroke-width:1.0;"
+         id="ellipse34" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="14"
+         lengthAdjust="spacing"
+         textLength="199"
+         x="27"
+         y="581.6357"
+         id="text35">neighbors : std::vector&lt;int&gt;</text>
+    </g>
+    <!--class RandomPoint-->
+    <!--class Simplex-->
+    <!--class std::hashstd::pairint,std::tupleint,int,int-->
+    <!--reverse link Box to BoudingBox-->
+    <!--reverse link Point to RandomPoint-->
+    <!--reverse link Box to Box-->
+    <g
+       id="link_Box_Box">
+      <path
+         codeLine="86"
+         d="M536.2195,509.3167 C556.5195,513.6167 559,522.3 559,540.34 C559,558.39 544.78,569.56 524.48,573.86 "
+         fill="none"
+         id="Box-backto-Box"
+         style="stroke:#181818;stroke-width:1.0;" />
+      <polygon
+         fill="#181818"
+         points="524.48,506.83,529.5209,511.9865,536.2195,509.3167,531.1787,504.1602,524.48,506.83"
+         style="stroke:#181818;stroke-width:1.0;"
+         id="polygon43" />
+    </g>
+    <!--reverse link Box to Point-->
+    <g
+       id="link_Box_Point">
+      <path
+         codeLine="89"
+         d="M412,601.14 C412,621.64 412,634.05 412,656.67 "
+         fill="none"
+         id="Box-backto-Point"
+         style="stroke:#181818;stroke-width:1.0;" />
+      <polygon
+         fill="#181818"
+         points="412,589.14,408,595.14,412,601.14,416,595.14,412,589.14"
+         style="stroke:#181818;stroke-width:1.0;"
+         id="polygon44" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="13"
+         lengthAdjust="spacing"
+         textLength="8"
+         x="403.4625"
+         y="608.7804"
+         id="text44">2</text>
+    </g>
+    <!--reverse link HashOctree to OctreeNode-->
+    <g
+       id="link_HashOctree_OctreeNode">
+      <path
+         codeLine="92"
+         d="M363,214.16 C363,233.8 363,242.24 363,261.24 "
+         fill="none"
+         id="HashOctree-backto-OctreeNode"
+         style="stroke:#181818;stroke-width:1.0;" />
+      <polygon
+         fill="none"
+         points="363,202.16,359,208.16,363,214.16,367,208.16,363,202.16"
+         style="stroke:#181818;stroke-width:1.0;"
+         id="polygon45" />
+    </g>
+    <!--reverse link HashOctree to Point-->
+    <g
+       id="link_HashOctree_Point">
+      <path
+         codeLine="95"
+         d="M516.6677,210.4523 C534.1777,228.2423 541.23,239.69 552,261.67 C617.58,395.51 619.74,460.84 559,596.94 C539.86,639.83 499.1,674.59 465.35,697.63 "
+         fill="none"
+         id="HashOctree-backto-Point"
+         style="stroke:#181818;stroke-width:1.0;" />
+      <polygon
+         fill="#181818"
+         points="508.25,201.9,509.6081,208.9821,516.6677,210.4523,515.3096,203.3703,508.25,201.9"
+         style="stroke:#181818;stroke-width:1.0;"
+         id="polygon46" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="13"
+         lengthAdjust="spacing"
+         textLength="8"
+         x="510.623"
+         y="221.6874"
+         id="text46">2</text>
+    </g>
+    <!--reverse link HashOctree to Polyhedron-->
+    <g
+       id="link_HashOctree_Polyhedron">
+      <path
+         codeLine="98"
+         d="M229.2179,210.7546 C211.8079,228.9246 204.08,240.31 192,261.67 C152.61,331.34 140.67,424.66 137.2,483.39 "
+         fill="none"
+         id="HashOctree-backto-Polyhedron"
+         style="stroke:#181818;stroke-width:1.0;" />
+      <polygon
+         fill="#181818"
+         points="237.52,202.09,230.4807,203.6549,229.2179,210.7546,236.2571,209.1897,237.52,202.09"
+         style="stroke:#181818;stroke-width:1.0;"
+         id="polygon47" />
+    </g>
+    <!--reverse link OctreeNode to Box-->
+    <g
+       id="link_OctreeNode_Box">
+      <path
+         codeLine="101"
+         d="M386.0564,435.7702 C391.7864,458.6402 394.93,471.18 400,491.45 "
+         fill="none"
+         id="OctreeNode-backto-Box"
+         style="stroke:#181818;stroke-width:1.0;" />
+      <polygon
+         fill="#181818"
+         points="383.14,424.13,380.7181,430.9222,386.0564,435.7702,388.4783,428.978,383.14,424.13"
+         style="stroke:#181818;stroke-width:1.0;"
+         id="polygon48" />
+    </g>
+    <!--reverse link OctreeNode to OctreeNode-->
+    <g
+       id="link_OctreeNode_OctreeNode">
+      <path
+         codeLine="104"
+         d="M528.4403,312.9115 C549.2503,318.4215 551.5,326.31 551.5,342.71 C551.5,359.12 537.65,370.08 516.84,375.59 "
+         fill="none"
+         id="OctreeNode-backto-OctreeNode"
+         style="stroke:#181818;stroke-width:1.0;" />
+      <polygon
+         fill="none"
+         points="516.84,309.84,521.6163,315.2425,528.4403,312.9115,523.664,307.509,516.84,309.84"
+         style="stroke:#181818;stroke-width:1.0;"
+         id="polygon49" />
+    </g>
+    <!--reverse link OctreeNode to Polyhedron-->
+    <g
+       id="link_OctreeNode_Polyhedron">
+      <path
+         codeLine="107"
+         d="M260.6006,431.9647 C237.4906,451.8847 222.31,464.96 200.89,483.42 "
+         fill="none"
+         id="OctreeNode-backto-Polyhedron"
+         style="stroke:#181818;stroke-width:1.0;" />
+      <polygon
+         fill="none"
+         points="269.69,424.13,262.5337,425.0176,260.6006,431.9647,267.7569,431.0772,269.69,424.13"
+         style="stroke:#181818;stroke-width:1.0;"
+         id="polygon50" />
+    </g>
+    <!--reverse link Polyhedron to BoudingBox-->
+    <!--reverse link Polyhedron to Point-->
+    <g
+       id="link_Polyhedron_Point">
+      <path
+         codeLine="113"
+         d="M228.3657,604.0839 C273.7857,634.9439 318.94,665.61 358.71,692.63 "
+         fill="none"
+         id="Polyhedron-backto-Point"
+         style="stroke:#181818;stroke-width:1.0;" />
+      <polygon
+         fill="#181818"
+         points="218.44,597.34,221.1549,604.0205,228.3657,604.0839,225.6508,597.4034,218.44,597.34"
+         style="stroke:#181818;stroke-width:1.0;"
+         id="polygon52" />
+      <text
+         fill="#000000"
+         font-family="sans-serif"
+         font-size="13"
+         lengthAdjust="spacing"
+         textLength="8"
+         x="219.5096"
+         y="616.872"
+         id="text52">2</text>
+    </g>
+    <!--SRC=[ZLJRQkCm47rUVuNeIy2f4-Y-BCOOjdtPGcdBxWS4rPxQMXIDaPJGzFBlEoFRiPAcxGO2cdDcpbmqyd8cxXx-GkMTc2sJfDBIEN69crgPvXAVn4kIl2KJpi2t-Le-YLpSepAUBMKYotLQUQW9SRxESscjt1KKU2v-b6cazKkwzgxo5e0bCuleAQP7Rh66z8iyn8MZkpRiJao5ndaHs8pO6zY29dW0bBa1-NW8TYnmXHl3gPrwXXMZMxHeK5s1rcviOqiJGblSezwrK1DVaYCb99xTyvpENYe3TlMzZhgS-Wc3Uq1RWwKW6WYPdRHWJhRzSMlpgbMw7elk8HrtDJ_idGN_gwEqZEeE-KF91ksAR-5He_I3lJkodoCxzetz9fyuovXycCv-xV9e1tbGqSLlmNeO1lIk6G9BBWfKqzAmZnq2FUN_BKsDwx7N2V-Zrfs6iEkPwyyhNezXn9DZq6vfayEXayeIVnuClw4mjeQ_A3oGalHGbEMGZNxBcRWsBLZbfQb0M20FHRVTggv_aGiUH_6QPM8HZOJmlkoUYHhPo_vi6WjDKFj8DkrLWnpRPnTdFJOgBQ9NYanCYth4VXew4EDbCnizZBYA23wHxvWzb8osAJqrhZtxhjPXOhVW-Ck5- -_XFm00]-->
+  </g>
+</svg>
